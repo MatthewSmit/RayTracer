@@ -1,0 +1,56 @@
+{
+  "objects": [
+    {
+      "type": "plane",
+      "position": [ 0, 0, -100 ],
+      "normal": [ 0, 0, 1 ],
+      "material": {
+        "type": "texture",
+        "path": "pattern.png",
+        "scaling": [ 1, 1 ],
+        "specularity": 0
+      }
+    },
+    {
+      "type": "polygon",
+      "points": [
+        [ -5, 15, -80 ],
+        [ 5, 15, -80 ],
+        [ 5, 5, -80 ],
+        [ -5, 5, -80 ]
+      ],
+      "texCoords": [
+        [ 0, 1 ],
+        [ 1, 1 ],
+        [ 1, 0 ],
+        [ 0, 0 ]
+      ],
+      "material": {
+        "type": "texture",
+        "path": "pattern.png",
+        "scaling": [ 1, 1 ],
+        "specularity": 0
+      }
+    },
+    {
+      "type": "sphere",
+      "position": [ 0, 0, -40 ],
+      "radius": 5,
+      "material": {
+        "type": "texture",
+        "path": "pattern.png",
+        "scaling": [ 1, 1 ],
+        "specularity": 0
+      }
+    }
+  ],
+  "ambientColour": [ 0.2, 0.2, 0.2 ],
+  "backgroundColour": {},
+  "lights": [
+    {
+      "type": "direction",
+      "direction": [ 0, 0, -1 ],
+      "colour": [ 1, 1, 1 ]
+    }
+  ]
+}

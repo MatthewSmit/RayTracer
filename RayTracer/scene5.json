@@ -1,0 +1,42 @@
+{
+  "objects": [
+    {
+      "type": "cylinder",
+      "position": [ 0, -15, -80 ],
+      "radius": 2,
+      "height": 5,
+      "material": {
+        "type": "solid",
+        "colour": [ 1, 0, 0, 0 ]
+      }
+    },
+    {
+      "type": "torus",
+      "position": [ -10, 0, -60 ],
+      "majorRadius": 2,
+      "minorRadius": 3,
+      "material": {
+        "type": "solid",
+        "colour": [ 1, 0, 0, 0 ]
+      }
+    },
+    {
+      "type": "sphere",
+      "position": [ 0, 15, -80 ],
+      "radius": 5,
+      "material": {
+        "type": "solid",
+        "colour": [ 1, 0, 0, 0 ]
+      }
+    }
+  ],
+  "ambientColour": [ 0.2, 0.2, 0.2 ],
+  "backgroundColour": {},
+  "lights": [
+    {
+      "type": "direction",
+      "direction": [ -10, -40, -3 ],
+      "colour": [ 1, 1, 1 ]
+    }
+  ]
+}

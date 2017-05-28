@@ -1,0 +1,63 @@
+{
+  "objects": [
+    {
+      "type": "plane",
+      "position": {},
+      "normal": [ 0, 1, 0 ],
+      "material": {
+        "type": "solid",
+        "colour": [ 1, 1, 1 ]
+      }
+    },
+    {
+      "type": "polygon",
+      "points": [
+        [ -1, 9, -45 ],
+        [ -1, 9, -55 ],
+        [ 5, 9, -55 ],
+        [ 5, 9, -45 ]
+      ],
+      "material": {
+        "type": "solid",
+        "colour": [ 0.5, 0, 0, 0.5 ],
+        "refractivity": 1
+      }
+    },
+    {
+      "type": "polygon",
+      "points": [
+        [ -5, 10, -45 ],
+        [ -5, 10, -55 ],
+        [ 1, 10, -55 ],
+        [ 1, 10, -45 ]
+      ],
+      "material": {
+        "type": "solid",
+        "colour": [ 0.5, 0.5, 0.5, 0.5 ],
+        "refractivity": 1
+      }
+    },
+    {
+      "type": "polygon",
+      "points": [
+        [ -1, 11, -49 ],
+        [ -1, 11, -51 ],
+        [ 1, 11, -51 ],
+        [ 1, 11, -49 ]
+      ],
+      "material": {
+        "type": "solid",
+        "colour": [ 1, 1, 1 ]
+      }
+    }
+  ],
+  "ambientColour": [ 0.2, 0.2, 0.2 ],
+  "backgroundColour": {},
+  "lights": [
+    {
+      "type": "direction",
+      "direction": [ 0, -1, 0 ],
+      "colour": [ 1, 1, 1 ]
+    }
+  ]
+}

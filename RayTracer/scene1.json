@@ -1,0 +1,63 @@
+{
+  "objects": [
+    {
+      "type": "sphere",
+      "position": [ -5, 10, -90 ],
+      "radius": 5,
+      "material": {
+        "type": "solid",
+        "colour": [ 0, 0, 1 ]
+      }
+    },
+    {
+      "type": "sphere",
+      "position": [ 15, 15, -100 ],
+      "radius": 8,
+      "material": {
+        "type": "solid",
+        "colour": [ 1, 0, 0 ]
+      }
+    },
+    {
+      "type": "sphere",
+      "position": [ 0, 25, -150 ],
+      "radius": 2,
+      "material": {
+        "type": "solid",
+        "colour": [ 0, 1, 0 ]
+      }
+    },
+    {
+      "type": "plane",
+      "position": {},
+      "normal": [ 0, 1, 0 ],
+      "material": {
+        "type": "solid",
+        "colour": [ 0.1, 0.1, 0.1 ],
+        "reflectivity": 0.9
+      }
+    },
+    {
+      "type": "polygon",
+      "points": [
+        [ 0, 15, -80 ],
+        [ -5, 5, -80 ],
+        [ 5, 5, -80 ]
+      ],
+      "material": {
+        "type": "solid",
+        "colour": [ 0.5, 0.5, 0.5, 0.5 ],
+        "refractivity": 1
+      }
+    }
+  ],
+  "ambientColour": [ 0.2, 0.2, 0.2 ],
+  "backgroundColour": {},
+  "lights": [
+    {
+      "type": "direction",
+      "direction": [ -10, -40, 3 ],
+      "colour": [ 1, 1, 1 ]
+    }
+  ]
+}
