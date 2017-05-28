@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClInclude Include="SceneObject.h" />
+    <ClInclude Include="MathsHelper.h" />
+    <ClInclude Include="RayTracer.h" />
+    <ClInclude Include="vec4.h" />
+    <ClInclude Include="Ray.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="Sphere.h" />
+    <ClInclude Include="Cone.h" />
+    <ClInclude Include="Cylinder.h" />
+    <ClInclude Include="Image.h" />
+    <ClInclude Include="InfinitePlane.h" />
+    <ClInclude Include="JsonSceneLoader.h" />
+    <ClInclude Include="Light.h" />
+    <ClInclude Include="Material.h" />
+    <ClInclude Include="Polygon.h" />
+    <ClInclude Include="Torus.h" />
+    <ClInclude Include="AlignedObject.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="RayTracer.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="InfinitePlane.cpp" />
+    <ClCompile Include="Cone.cpp" />
+    <ClCompile Include="Cylinder.cpp" />
+    <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="Image.cpp" />
+    <ClCompile Include="JsonSceneLoader.cpp" />
+    <ClCompile Include="Material.cpp" />
+    <ClCompile Include="Polygon.cpp" />
+    <ClCompile Include="Sphere.cpp" />
+    <ClCompile Include="Torus.cpp" />
+    <ClCompile Include="AlignedObject.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="scene3.json" />
+    <None Include="scene4.json" />
+    <None Include="sceneSchema.json" />
+    <None Include="scene2.json" />
+    <None Include="packages.config" />
+    <None Include="scene1.json" />
+    <None Include="scene5.json" />
+    <None Include="scene6.json" />
+  </ItemGroup>
+</Project>
