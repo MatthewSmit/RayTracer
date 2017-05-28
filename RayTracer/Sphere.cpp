@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include "Sphere.h"
 
 #include <limits>
@@ -7,11 +6,11 @@
 
 bool Sphere::intersect(const Ray& ray, IntersectionResult& result) const
 {
-	auto difference = ray.position - center;
-	auto b = dot(ray.direction, difference);
-	auto len = length(difference);
-	auto c = len * len - radius * radius;
-	auto delta = b * b - c;
+	const auto difference = ray.position - center;
+	const auto b = dot(ray.direction, difference);
+	const auto len = length(difference);
+	const auto c = len * len - radius * radius;
+	const auto delta = b * b - c;
 
 	if (fabs(delta) < std::numeric_limits<float>::epsilon())
 		return false;

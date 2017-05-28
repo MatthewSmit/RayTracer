@@ -9,6 +9,8 @@ Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
 		Debug|x86 = Debug|x86
+		Debug-Clang|x64 = Debug-Clang|x64
+		Debug-Clang|x86 = Debug-Clang|x86
 		FastDebug|x64 = FastDebug|x64
 		FastDebug|x86 = FastDebug|x86
 		Release|x64 = Release|x64
@@ -19,6 +21,10 @@ Global
 		{F980427A-D18F-4FE3-813F-8328406BE5DF}.Debug|x64.Build.0 = Debug|x64
 		{F980427A-D18F-4FE3-813F-8328406BE5DF}.Debug|x86.ActiveCfg = Debug|Win32
 		{F980427A-D18F-4FE3-813F-8328406BE5DF}.Debug|x86.Build.0 = Debug|Win32
+		{F980427A-D18F-4FE3-813F-8328406BE5DF}.Debug-Clang|x64.ActiveCfg = Debug-Clang|x64
+		{F980427A-D18F-4FE3-813F-8328406BE5DF}.Debug-Clang|x64.Build.0 = Debug-Clang|x64
+		{F980427A-D18F-4FE3-813F-8328406BE5DF}.Debug-Clang|x86.ActiveCfg = Debug-Clang|Win32
+		{F980427A-D18F-4FE3-813F-8328406BE5DF}.Debug-Clang|x86.Build.0 = Debug-Clang|Win32
 		{F980427A-D18F-4FE3-813F-8328406BE5DF}.FastDebug|x64.ActiveCfg = FastDebug|x64
 		{F980427A-D18F-4FE3-813F-8328406BE5DF}.FastDebug|x64.Build.0 = FastDebug|x64
 		{F980427A-D18F-4FE3-813F-8328406BE5DF}.FastDebug|x86.ActiveCfg = FastDebug|Win32

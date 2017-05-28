@@ -6,7 +6,6 @@
     <ClInclude Include="RayTracer.h" />
     <ClInclude Include="vec4.h" />
     <ClInclude Include="Ray.h" />
-    <ClInclude Include="stdafx.h" />
     <ClInclude Include="Sphere.h" />
     <ClInclude Include="Cone.h" />
     <ClInclude Include="Cylinder.h" />
@@ -25,7 +24,6 @@
     <ClCompile Include="InfinitePlane.cpp" />
     <ClCompile Include="Cone.cpp" />
     <ClCompile Include="Cylinder.cpp" />
-    <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="Image.cpp" />
     <ClCompile Include="JsonSceneLoader.cpp" />
     <ClCompile Include="Material.cpp" />

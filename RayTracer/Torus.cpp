@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include "Torus.h"
 #include "mathsHelper.h"
 
@@ -31,12 +30,12 @@ bool solveCubic(float a, float b, float c, float d, float& root)
 	if (a == 0 || abs(a / b) < 1.0e-6f)
 		return solveQuadratic(b, c, d, root);
 
-	auto B = b / a, C = c / a, D = d / a;
+	const auto B = b / a, C = c / a, D = d / a;
 
-	auto Q = (B * B - C * 3) / 9;
-	auto QQQ = Q * Q * Q;
-	auto R = (2 * B * B * B - 9 * B * C + 27 * D) / 54;
-	auto RR = R * R;
+	const auto Q = (B * B - C * 3) / 9;
+	const auto QQQ = Q * Q * Q;
+	const auto R = (2 * B * B * B - 9 * B * C + 27 * D) / 54;
+	const auto RR = R * R;
 
 	// 3 real roots
 	if (RR < QQQ)
@@ -44,7 +43,7 @@ bool solveCubic(float a, float b, float c, float d, float& root)
 		/* This sqrt and division is safe, since RR >= 0, so QQQ > RR,    */
 		/* so QQQ > 0.  The acos is also safe, since RR/QQQ < 1, and      */
 		/* thus R/sqrt(QQQ) < 1.                                     */
-		auto theta = acos(R / sqrt(QQQ));
+		const auto theta = acos(R / sqrt(QQQ));
 		/* This sqrt is safe, since QQQ >= 0, and thus Q >= 0             */
 		auto r1 = -2 * sqrt(Q);
 		auto r2 = r1;
@@ -85,14 +84,14 @@ bool solveQuartic(float a, float b, float c, float d, float e, float& root)
 	if (a == 0 || abs(a / b) < 1.0e-6f || abs(a / c) < 1.0e-6f)
 		return solveCubic(b, c, d, e, root);
 
-	auto aa = a * a;
-	auto aaa = aa * a;
-	auto bb = b * b;
-	auto bbb = bb * b;
-	auto alpha = -3 * bb / (8 * aa) + c / a;
-	auto alpha2 = alpha * alpha;
-	auto beta = bbb / (8 * aaa) + b * c / (-2 * aa) + d / a;
-	auto gamma = -3 * bbb * b / (256 * aaa * a) + c * bb / (16 * aaa) + b * d / (-4 * aa) + e / a;
+	const auto aa = a * a;
+	const auto aaa = aa * a;
+	const auto bb = b * b;
+	const auto bbb = bb * b;
+	const auto alpha = -3 * bb / (8 * aa) + c / a;
+	const auto alpha2 = alpha * alpha;
+	const auto beta = bbb / (8 * aaa) + b * c / (-2 * aa) + d / a;
+	const auto gamma = -3 * bbb * b / (256 * aaa * a) + c * bb / (16 * aaa) + b * d / (-4 * aa) + e / a;
 
 	if (beta == 0)
 	{
@@ -100,20 +99,20 @@ bool solveQuartic(float a, float b, float c, float d, float e, float& root)
 		return true;
 	}
 
-	std::complex<float> P = -alpha2 / 12 - gamma;
-	std::complex<float> Q = -alpha2 * alpha / 108 + alpha * gamma / 3 - beta * beta / 8;
-	auto R = Q * 0.5f + sqrt(Q * Q * 0.25f + P * P * P / 27.0f);
-	auto U = pow(R, 1.0f / 3.0f);
+	const std::complex<float> P = -alpha2 / 12 - gamma;
+	const std::complex<float> Q = -alpha2 * alpha / 108 + alpha * gamma / 3 - beta * beta / 8;
+	const auto R = Q * 0.5f + sqrt(Q * Q * 0.25f + P * P * P / 27.0f);
+	const auto U = pow(R, 1.0f / 3.0f);
 	auto y = -5 * alpha / 6 - U;
 	if (U != 0.0f)
 		y += P / (3.0f * U);
-	auto W = sqrt(alpha + y + y);
+	const auto W = sqrt(alpha + y + y);
 
 	auto foundRealRoot = false;
 
-	auto firstPart = b / (-4 * a);
-	auto secondPart = -3 * alpha - 2.0f * y;
-	auto thirdPart = 2.0f * beta / W;
+	const auto firstPart = b / (-4 * a);
+	const auto secondPart = -3 * alpha - 2.0f * y;
+	const auto thirdPart = 2.0f * beta / W;
 
 	auto aRoot = firstPart + 0.5f * (-W - sqrt(secondPart + thirdPart));
 	if (abs(aRoot.imag()) < 1.0e-10f && aRoot.real() >= 0)
@@ -148,21 +147,21 @@ bool solveQuartic(float a, float b, float c, float d, float e, float& root)
 
 bool Torus::intersect(const Ray& ray, IntersectionResult& result) const
 {
-	auto EX = (ray.position - position).x;
-	auto EY = (ray.position - position).y;
-	auto EZ = (ray.position - position).z;
-	auto DX = ray.direction.x;
-	auto DY = ray.direction.y;
-	auto DZ = ray.direction.z;
+	const auto EX = (ray.position - position).x;
+	const auto EY = (ray.position - position).y;
+	const auto EZ = (ray.position - position).z;
+	const auto DX = ray.direction.x;
+	const auto DY = ray.direction.y;
+	const auto DZ = ray.direction.z;
 
-	auto A = majorRadius;
+	const auto A = majorRadius;
 
-	auto G = 4 * A * A * (EX * EX + EY * EY);
-	auto H = 8 * A * A * (DX * EX + DY * EY);
-	auto I = 4 * A * A * (DX * DX + DY * DY);
-	auto J = lengthSquared(ray.position);
-	auto K = 2 * dot(ray.direction, ray.position);
-	auto L = lengthSquared(ray.direction) + (A * A - minorRadius * minorRadius);
+	const auto G = 4 * A * A * (EX * EX + EY * EY);
+	const auto H = 8 * A * A * (DX * EX + DY * EY);
+	const auto I = 4 * A * A * (DX * DX + DY * DY);
+	const auto J = lengthSquared(ray.position);
+	const auto K = 2 * dot(ray.direction, ray.position);
+	const auto L = lengthSquared(ray.direction) + (A * A - minorRadius * minorRadius);
 
 	float root;
 	auto found = solveQuartic(J * J, 2 * J * K, 2 * J * L + K * K - G, 2 * K * L - H, L * L - I, root);

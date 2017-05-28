@@ -1,8 +1,6 @@
-#include "stdafx.h"
 #include "InfinitePlane.h"
 
 #include <limits>
-#include <math.h>
 #include "mathsHelper.h"
 
 bool InfinitePlane::intersect(const Ray& ray, IntersectionResult& result) const

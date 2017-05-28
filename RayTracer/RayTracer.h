@@ -1,5 +1,7 @@
 #pragma once
+#include "Image.h"
 #include "Light.h"
+#include "SceneObject.h"
 
 #include <memory>
 #include <vector>
@@ -15,9 +17,6 @@ static constexpr float XMIN = -WIDTH * 0.5;
 static constexpr float XMAX = WIDTH * 0.5;
 static constexpr float YMIN = -HEIGHT * 0.5;
 static constexpr float YMAX = HEIGHT * 0.5;
-
-class Image;
-class SceneObject;
 
 struct Ray;
 

@@ -1,16 +1,18 @@
-#include "stdafx.h"
 #include "Cylinder.h"
+
+#include <algorithm>
+#include <limits>
 
 static const vec4 xzMask{ 1, 0, 1, 0 };
 
 bool Cylinder::intersect(const Ray& ray, IntersectionResult& result) const
 {
-	auto xzDirection = normalise(ray.direction * xzMask);
-	auto difference = (ray.position - bottomCenter) * xzMask;
-	auto b = dot(xzDirection, difference);
-	auto len = length(difference);
-	auto c = len * len - radius * radius;
-	auto delta = b * b - c;
+	const auto xzDirection = normalise(ray.direction * xzMask);
+	const auto difference = (ray.position - bottomCenter) * xzMask;
+	const auto b = dot(xzDirection, difference);
+	const auto len = length(difference);
+	const auto c = len * len - radius * radius;
+	const auto delta = b * b - c;
 
 	if (fabs(delta) < std::numeric_limits<float>::epsilon())
 		return false;
@@ -28,11 +30,11 @@ bool Cylinder::intersect(const Ray& ray, IntersectionResult& result) const
 	if (t0 > t1)
 		std::swap(t0, t1);
 
-	auto hit0 = ray.calculatePoint(t0) - bottomCenter;
-	auto hit1 = ray.calculatePoint(t1) - bottomCenter;
+	const auto hit0 = ray.calculatePoint(t0) - bottomCenter;
+	const auto hit1 = ray.calculatePoint(t1) - bottomCenter;
 
-	auto y0 = hit0.y;
-	auto y1 = hit1.y;
+	const auto y0 = hit0.y;
+	const auto y1 = hit1.y;
 
 	if (y0 < 0)
 	{

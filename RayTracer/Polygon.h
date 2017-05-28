@@ -96,7 +96,7 @@ inline bool Polygon<4>::inside(const vec4& point) const
 		point - points[3],
 	};
 
-	auto original = dot(cross(lines[0], values[0]), normal);
+	const auto original = dot(cross(lines[0], values[0]), normal);
 
 	auto result = dot(cross(lines[1], values[1]), normal);
 	if (!sameSign(original, result))

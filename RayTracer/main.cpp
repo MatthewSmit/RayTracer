@@ -1,5 +1,3 @@
-#include "stdafx.h"
-
 #include "RayTracer.h"
 
 #include <GL/freeglut.h>
@@ -18,10 +16,10 @@ void display()
 	constexpr auto cellX = (XMAX - XMIN) / NUMDIV;  //cell width
 	constexpr auto cellY = (YMAX - YMIN) / NUMDIV;  //cell height
 
-	auto start = std::chrono::high_resolution_clock::now();
+	const auto start = std::chrono::high_resolution_clock::now();
 	rayTracer.rayTrace();
-	auto end = std::chrono::high_resolution_clock::now();
-	auto duration = std::chrono::duration_cast<std::chrono::duration<float>>(end - start).count();
+	const auto end = std::chrono::high_resolution_clock::now();
+	const auto duration = std::chrono::duration_cast<std::chrono::duration<float>>(end - start).count();
 	printf("Took %f seconds\n", duration);
 
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -32,10 +30,10 @@ void display()
 
 	for (auto x = 0; x < NUMDIV; x++)
 	{
-		auto xp = XMIN + x * cellX;
+		const auto xp = XMIN + x * cellX;
 		for (auto y = 0; y < NUMDIV; y++)
 		{
-			auto yp = YMIN + y * cellY;
+			const auto yp = YMIN + y * cellY;
 
 			glColor3fv(rayTracer.getPixels() + (x + y * NUMDIV) * 3);
 			glVertex2f(xp, yp);				//Draw each cell with its colour value

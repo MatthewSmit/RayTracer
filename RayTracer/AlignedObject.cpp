@@ -1,5 +1,6 @@
-#include "stdafx.h"
 #include "AlignedObject.h"
+
+#include <new>
 
 #if !defined(_MSC_VER)
 #define _aligned_malloc(size, alignment) aligned_alloc((alignment), (size))

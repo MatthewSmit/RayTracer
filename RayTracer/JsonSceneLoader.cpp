@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include "JsonSceneLoader.h"
 
 #include "Cone.h"
@@ -18,36 +17,35 @@ namespace
 {
 	vec4 parseVector(const rapidjson::Value& value)
 	{
-		float x, y, z;
+		float x = 0;
+		float y = 0;
+		float z = 0;
 		if (value.IsArray())
 		{
-			auto number = value.Capacity();
+			const auto number = value.Capacity();
 			if (number > 3)
 				throw std::exception();
 
 			if (number > 0)
 				x = static_cast<float>(value[0].GetDouble());
-			else x = 0;
 
 			if (number > 1)
 				y = static_cast<float>(value[1].GetDouble());
-			else y = 0;
 
 			if (number > 2)
 				z = static_cast<float>(value[2].GetDouble());
-			else z = 0;
 		}
 		else if (value.IsObject())
 		{
 			if (value.HasMember("x"))
 				x = static_cast<float>(value["x"].GetDouble());
-			else x = 0;
+
 			if (value.HasMember("y"))
 				y = static_cast<float>(value["y"].GetDouble());
-			else y = 0;
+
 			if (value.HasMember("z"))
 				z = static_cast<float>(value["z"].GetDouble());
-			else z = 0;
+
 		}
 		else throw std::exception();
 
@@ -56,43 +54,41 @@ namespace
 
 	vec4 parseColour(const rapidjson::Value& value)
 	{
-		float r, g, b, a;
+		float r = 0;
+		float g = 0;
+		float b = 0;
+		float a = 0;
 		if (value.IsArray())
 		{
-			auto number = value.Capacity();
+			const auto number = value.Capacity();
 			if (number > 4)
 				throw std::exception();
 
 			if (number > 0)
 				r = static_cast<float>(value[0].GetDouble());
-			else r = 0;
 
 			if (number > 1)
 				g = static_cast<float>(value[1].GetDouble());
-			else g = 0;
 
 			if (number > 2)
 				b = static_cast<float>(value[2].GetDouble());
-			else b = 0;
 
 			if (number > 3)
 				a = static_cast<float>(value[3].GetDouble());
-			else a = 1;
 		}
 		else if (value.IsObject())
 		{
 			if (value.HasMember("r"))
 				r = static_cast<float>(value["r"].GetDouble());
-			else r = 0;
+
 			if (value.HasMember("g"))
 				g = static_cast<float>(value["g"].GetDouble());
-			else g = 0;
+
 			if (value.HasMember("b"))
 				b = static_cast<float>(value["b"].GetDouble());
-			else b = 0;
+
 			if (value.HasMember("a"))
 				a = static_cast<float>(value["a"].GetDouble());
-			else a = 1;
 		}
 		else throw std::exception();
 
@@ -175,7 +171,7 @@ namespace
 
 	std::unique_ptr<SceneObject> createPolygon(vec4* points, vec4* texCoords, int size, const Material& material)
 	{
-		SceneObject* object;
+		SceneObject* object = nullptr;
 		switch (size)
 		{
 		case 3:
@@ -194,17 +190,17 @@ namespace
 	void parsePolygon(RayTracer* rayTracer, const rapidjson::Value& object)
 	{
 		auto& jsonPoints = object["points"];
-		auto material = parseMaterial(rayTracer, object["material"]);
+		const auto material = parseMaterial(rayTracer, object["material"]);
 
-		auto numberPoints = jsonPoints.Capacity();
-		auto points = std::unique_ptr<vec4[]>{ new vec4[numberPoints] };
+		const auto numberPoints = jsonPoints.Capacity();
+		const auto points = std::unique_ptr<vec4[]>{ new vec4[numberPoints] };
 		for (auto i = 0u; i < numberPoints; i++)
 			points[i] = parseVector(jsonPoints[i]);
 
-		auto texCoords = std::unique_ptr<vec4[]>{ new vec4[numberPoints] };
+		const auto texCoords = std::unique_ptr<vec4[]>{ new vec4[numberPoints] };
 		if (object.HasMember("texCoords"))
 		{
-			auto& jsonTexCoords = object["texCoords"];
+			const auto& jsonTexCoords = object["texCoords"];
 			if (numberPoints != jsonTexCoords.Capacity())
 				throw std::exception();
 
@@ -288,7 +284,7 @@ void loadSceneJson(RayTracer* rayTracer, const char* fileName)
 {
 	rayTracer->clear();
 
-	std::ifstream file(fileName);
+	std::ifstream file{ fileName };
 
 	if (!file)
 		throw std::exception();
@@ -307,10 +303,10 @@ void loadSceneJson(RayTracer* rayTracer, const char* fileName)
 		throw std::exception();
 	}
 
-	auto& objects = json["objects"];
-	auto& lights = json["lights"];
-	auto& ambientColour = json["ambientColour"];
-	auto& backgroundColour = json["backgroundColour"];
+	const auto& objects = json["objects"];
+	const auto& lights = json["lights"];
+	const auto& ambientColour = json["ambientColour"];
+	const auto& backgroundColour = json["backgroundColour"];
 
 	for (auto i = objects.Begin(); i != objects.End(); i++)
 		parseObject(rayTracer, *i);

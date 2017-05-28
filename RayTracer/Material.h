@@ -1,4 +1,5 @@
 #pragma once
+#include "vec4.h"
 
 class Image;
 class SceneObject;
@@ -14,8 +15,6 @@ enum class MaterialType
 
 struct Material
 {
-	MaterialType Type;
-
 	union
 	{
 		vec4 SolidColour;
@@ -25,6 +24,7 @@ struct Material
 			Image* MaterialImage;
 		};
 	};
+	MaterialType Type;
 	float Reflectivity;
 	float Refractivity;
 	float Specularity;
@@ -32,8 +32,8 @@ struct Material
 	bool IsTransparent;
 
 	explicit Material(const vec4& colour, float reflectivity = 0, float refractivity = 0, float specularity = DEFAULT_SPECULAR) :
-		Type{ MaterialType::Solid },
 		SolidColour{ colour },
+		Type{ MaterialType::Solid },
 		Reflectivity{ reflectivity },
 		Refractivity{ refractivity },
 		Specularity{ specularity }
@@ -42,9 +42,9 @@ struct Material
 	}
 
 	explicit Material(Image* image, const vec4& scaling, float reflectivity = 0, float refractivity = 0, float specularity = DEFAULT_SPECULAR) :
-		Type{ MaterialType::Texture },
 		Scaling{ scaling },
 		MaterialImage{ image },
+		Type{ MaterialType::Texture },
 		Reflectivity{ reflectivity },
 		Refractivity{ refractivity },
 		Specularity{ specularity }

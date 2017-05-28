@@ -1,24 +1,25 @@
-#include "stdafx.h"
 #include "Cone.h"
+
+#include <exception>
 
 bool Cone::intersect(const Ray& ray, IntersectionResult& result) const
 {
-	auto axis = bottomCenter - vec4{ 0,-1, 0, 0 };
-	auto theta = normalise(axis);
-	auto m = pow(radius, 2) / pow(length(axis), 2);
-	auto w = ray.position - vec4{ 0, -1, 0, 0 };
+	const auto axis = bottomCenter - vec4{ 0,-1, 0, 0 };
+	const auto theta = normalise(axis);
+	const auto m = pow(radius, 2) / pow(length(axis), 2);
+	const auto w = ray.position - vec4{ 0, -1, 0, 0 };
 
-	auto a = dot(ray.direction, ray.direction) - m * pow(dot(ray.direction, theta), 2) - pow(dot(ray.direction, theta), 2);
-	auto b = 2 * (dot(ray.direction, w) - m * dot(ray.direction, theta) * dot(w, theta) - dot(ray.direction, theta) * dot(w, theta));
-	auto c = dot(w, w) - m * pow(dot(w, theta), 2) - pow(dot(w, theta), 2);
+	const auto a = dot(ray.direction, ray.direction) - m * pow(dot(ray.direction, theta), 2) - pow(dot(ray.direction, theta), 2);
+	const auto b = 2 * (dot(ray.direction, w) - m * dot(ray.direction, theta) * dot(w, theta) - dot(ray.direction, theta) * dot(w, theta));
+	const auto c = dot(w, w) - m * pow(dot(w, theta), 2) - pow(dot(w, theta), 2);
 
-	auto discriminant = pow(b, 2) - 4 * a * c;
+	const auto discriminant = pow(b, 2) - 4 * a * c;
 
 	if (discriminant < 0)
 		return false;
 
-	auto t1 = static_cast<float>((-b - sqrt(discriminant)) / (2 * a));
-	auto t2 = static_cast<float>((-b + sqrt(discriminant)) / (2 * a));
+	const auto t1 = static_cast<float>((-b - sqrt(discriminant)) / (2 * a));
+	const auto t2 = static_cast<float>((-b + sqrt(discriminant)) / (2 * a));
 
 	result.distance = t1 < t2 ? t1 : t2;
 	if (result.distance < 0)

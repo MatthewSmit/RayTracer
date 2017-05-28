@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include "Image.h"
 
 Image::Image(int width, int height, std::unique_ptr<uint8_t[]>&& pixels) :
@@ -18,23 +17,23 @@ vec4 Image::sample(const vec4& textureCoordinate) const
 	x *= width;
 	y *= height;
 
-	auto ix = static_cast<int>(x);
-	auto iy = static_cast<int>(y);
-	auto ix1 = (ix + 1) % width;
-	auto iy1 = (iy + 1) % height;
+	const auto ix = static_cast<int>(x);
+	const auto iy = static_cast<int>(y);
+	const auto ix1 = (ix + 1) % width;
+	const auto iy1 = (iy + 1) % height;
 
-	auto fx = x - ix;
-	auto fy = y - iy;
+	const auto fx = x - ix;
+	const auto fy = y - iy;
 
-	auto tl = sample(ix, iy);
+	const auto tl = sample(ix, iy);
 	return tl;
-	auto bl = sample(ix1, iy);
+	/*auto bl = sample(ix1, iy);
 	auto tr = sample(ix, iy1);
 	auto br = sample(ix1, iy1);
 
 	auto l = lerp(tl, bl, fy);
 	auto r = lerp(tr, br, fy);
-	return lerp(l, r, fx);
+	return lerp(l, r, fx);*/
 }
 
 vec4 Image::sample(int x, int y) const
@@ -47,5 +46,5 @@ vec4 Image::sample(int x, int y) const
 		static_cast<float>(pixel[2]),
 		static_cast<float>(pixel[3])
 	};
-	return colour / vec4{ 255.0f };
+	return colour / 255;
 }

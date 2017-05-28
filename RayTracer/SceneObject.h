@@ -2,6 +2,7 @@
 #include "AlignedObject.h"
 #include "Material.h"
 #include "Ray.h"
+#include "vec4.h"
 
 struct IntersectionResult
 {
