@@ -9,7 +9,7 @@ void calculateBarycentricCoordinates(const vec4& hitPoint, const vec4& p0, const
 
 inline bool sameSign(float lhs, float rhs)
 {
-	return ~(*reinterpret_cast<int*>(&lhs) ^ *reinterpret_cast<int*>(&rhs)) >> 31;
+	return (bool)(~(*reinterpret_cast<int*>(&lhs) ^ *reinterpret_cast<int*>(&rhs)) >> 31);
 }
 
 template<int size>

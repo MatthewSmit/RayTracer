@@ -5,7 +5,7 @@ class alignas(16) Cone final : public SceneObject
 {
 public:
 	Cone(const vec4& bottomCenter, float radius, float height, const Material& material) :
-		bottomCenter(bottomCenter),
+		bottomCenter{bottomCenter},
 		radius{ radius },
 		height{ height }
 	{

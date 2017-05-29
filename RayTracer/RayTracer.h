@@ -8,15 +8,14 @@
 
 struct IntersectionResult;
 
-static constexpr float WIDTH = 20.0;
-static constexpr float HEIGHT = 20.0;
-static constexpr float EDIST = 40.0;
+static constexpr float WIDTH = 20.0f;
+static constexpr float HEIGHT = 20.0f;
+static constexpr float EDIST = 40.0f;
 static constexpr int NUMDIV = 500;
-static constexpr int MAX_STEPS = 5;
-static constexpr float XMIN = -WIDTH * 0.5;
-static constexpr float XMAX = WIDTH * 0.5;
-static constexpr float YMIN = -HEIGHT * 0.5;
-static constexpr float YMAX = HEIGHT * 0.5;
+static constexpr float XMIN = -WIDTH * 0.5f;
+static constexpr float XMAX = WIDTH * 0.5f;
+static constexpr float YMIN = -HEIGHT * 0.5f;
+static constexpr float YMAX = HEIGHT * 0.5f;
 
 struct Ray;
 

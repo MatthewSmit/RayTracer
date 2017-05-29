@@ -27,6 +27,8 @@ endif(NOT OPENGL_FOUND)
 
 add_definitions("-msse3")
 
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall")
+
 set(SOURCE_FILES
         RayTracer/AlignedObject.cpp
         RayTracer/AlignedObject.h
