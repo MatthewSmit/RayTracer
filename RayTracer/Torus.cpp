@@ -1,13 +1,13 @@
 #include "Torus.h"
-#include "mathsHelper.h"
+#include "MathsHelper.h"
 
 #include <complex>
 
 bool solveQuadratic(float a, float b, float c, float& root)
 {
-	if (a == 0.0 || abs(a / b) < 1.0e-6f)
+	if (a == 0.0 || fabs(a / b) < 1.0e-6f)
 	{
-		if (abs(b) < 1.0e-4f)
+		if (fabs(b) < 1.0e-4f)
 			return false;
 
 		root = -c / b;
@@ -17,7 +17,7 @@ bool solveQuadratic(float a, float b, float c, float& root)
 	auto discriminant = b * b - 4 * a * c;
 	if (discriminant >= 0)
 	{
-		discriminant = sqrt(discriminant);
+		discriminant = sqrtf(discriminant);
 		root = (b + discriminant) * -0.5f / a;
 		return true;
 	}
@@ -27,7 +27,7 @@ bool solveQuadratic(float a, float b, float c, float& root)
 //----------------------------------------------------------------------------
 bool solveCubic(float a, float b, float c, float d, float& root)
 {
-	if (a == 0 || abs(a / b) < 1.0e-6f)
+	if (a == 0 || fabs(a / b) < 1.0e-6f)
 		return solveQuadratic(b, c, d, root);
 
 	const auto B = b / a, C = c / a, D = d / a;
@@ -43,14 +43,14 @@ bool solveCubic(float a, float b, float c, float d, float& root)
 		/* This sqrt and division is safe, since RR >= 0, so QQQ > RR,    */
 		/* so QQQ > 0.  The acos is also safe, since RR/QQQ < 1, and      */
 		/* thus R/sqrt(QQQ) < 1.                                     */
-		const auto theta = acos(R / sqrt(QQQ));
+		const auto theta = acosf(R / sqrtf(QQQ));
 		/* This sqrt is safe, since QQQ >= 0, and thus Q >= 0             */
-		auto r1 = -2 * sqrt(Q);
+		auto r1 = -2 * sqrtf(Q);
 		auto r2 = r1;
 		auto r3 = r1;
-		r1 *= cos(theta / 3);
-		r2 *= cos((theta + 2 * PI) / 3);
-		r3 *= cos((theta - 2 * PI) / 3);
+		r1 *= cosf(theta / 3);
+		r2 *= cosf((theta + 2 * PI) / 3);
+		r3 *= cosf((theta - 2 * PI) / 3);
 
 		r1 -= B / 3;
 		r2 -= B / 3;
@@ -66,7 +66,7 @@ bool solveCubic(float a, float b, float c, float d, float& root)
 	}
 	// 1 real root
 
-	auto A2 = -pow(fabs(c) + sqrt(RR - QQQ), 1.0f / 3.0f);
+	auto A2 = -powf(fabs(c) + sqrtf(RR - QQQ), 1.0f / 3.0f);
 	if (A2 != 0)
 	{
 		if (R < 0)
@@ -81,7 +81,7 @@ bool solveQuartic(float a, float b, float c, float d, float e, float& root)
 {
 	// When a or (a and b) are magnitudes of order smaller than C,D,E
 	// just ignore them entirely. 
-	if (a == 0 || abs(a / b) < 1.0e-6f || abs(a / c) < 1.0e-6f)
+	if (a == 0 || fabs(a / b) < 1.0e-6f || fabs(a / c) < 1.0e-6f)
 		return solveCubic(b, c, d, e, root);
 
 	const auto aa = a * a;
@@ -95,7 +95,7 @@ bool solveQuartic(float a, float b, float c, float d, float e, float& root)
 
 	if (beta == 0)
 	{
-		root = b / (-4 * a) + sqrt(0.5f * (-alpha + sqrt(alpha2 + 4 * gamma)));
+		root = b / (-4 * a) + sqrtf(0.5f * (-alpha + sqrtf(alpha2 + 4 * gamma)));
 		return true;
 	}
 
@@ -115,28 +115,28 @@ bool solveQuartic(float a, float b, float c, float d, float e, float& root)
 	const auto thirdPart = 2.0f * beta / W;
 
 	auto aRoot = firstPart + 0.5f * (-W - sqrt(secondPart + thirdPart));
-	if (abs(aRoot.imag()) < 1.0e-10f && aRoot.real() >= 0)
+	if (fabs(aRoot.imag()) < 1.0e-10f && aRoot.real() >= 0)
 	{
 		root = aRoot.real();
 		foundRealRoot = true;
 	}
 
 	aRoot = firstPart + 0.5f * (-W + sqrt(secondPart + thirdPart));
-	if (abs(aRoot.imag()) < 1.0e-10f && aRoot.real() >= 0 && (!foundRealRoot || aRoot.real() < root))
+	if (fabs(aRoot.imag()) < 1.0e-10f && aRoot.real() >= 0 && (!foundRealRoot || aRoot.real() < root))
 	{
 		root = aRoot.real();
 		foundRealRoot = true;
 	}
 
 	aRoot = firstPart + 0.5f * (W - sqrt(secondPart - thirdPart));
-	if (abs(aRoot.imag()) < 1.0e-10f && aRoot.real() >= 0 && (!foundRealRoot || aRoot.real() < root))
+	if (fabs(aRoot.imag()) < 1.0e-10f && aRoot.real() >= 0 && (!foundRealRoot || aRoot.real() < root))
 	{
 		root = aRoot.real();
 		foundRealRoot = true;
 	}
 
 	aRoot = firstPart + 0.5f * (W + sqrt(secondPart - thirdPart));
-	if (abs(aRoot.imag()) < 1.0e-10f && aRoot.real() >= 0 && (!foundRealRoot || aRoot.real() < root))
+	if (fabs(aRoot.imag()) < 1.0e-10f && aRoot.real() >= 0 && (!foundRealRoot || aRoot.real() < root))
 	{
 		root = aRoot.real();
 		foundRealRoot = true;

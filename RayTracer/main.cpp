@@ -55,7 +55,7 @@ void initialise()
 	gluOrtho2D(XMIN, XMAX, YMIN, YMAX);
 	glClearColor(0, 0, 0, 1);
 
-	loadSceneJson(&rayTracer, "scene1.json");
+	loadSceneJson(&rayTracer, "scene6.json");
 }
 
 int main(int argc, char *argv[])

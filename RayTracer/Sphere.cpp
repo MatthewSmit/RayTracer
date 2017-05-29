@@ -2,7 +2,7 @@
 
 #include <limits>
 #include <math.h>
-#include "mathsHelper.h"
+#include "MathsHelper.h"
 
 bool Sphere::intersect(const Ray& ray, IntersectionResult& result) const
 {

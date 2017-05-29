@@ -211,10 +211,13 @@ vec4 RayTracer::calculateShadows(const Ray& lightRay, SceneObject* selfObject) c
 		if (material.IsTransparent)
 		{
 			auto colour = material.getColour(result.point, hitObject);
-			allowedLight *= colour / colour.w * (1 - colour.w);
+			if (colour.w > 0)
+			{
+				allowedLight *= colour / colour.w * (1 - colour.w);
 
-			newLightRay.position = result.point;
-			selfObject = hitObject;
+				newLightRay.position = result.point;
+				selfObject = hitObject;
+			}
 		}
 		else return vec4{ 0 };
 	}
@@ -251,7 +254,7 @@ vec4 RayTracer::trace(const Ray& ray, SceneObject* selfObject, int step) const
 		float specularResult;
 		if (material.Specularity == 0)
 			specularResult = 0;
-		else specularResult = pow(std::max(dot(reflectionVector, -ray.direction), 0.0f), material.Specularity);
+		else specularResult = powf(std::max(dot(reflectionVector, -ray.direction), 0.0f), material.Specularity);
 
 		intensity += (diffuseResult + specularResult) * shadowLevel;
 	}

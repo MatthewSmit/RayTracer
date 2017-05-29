@@ -1,7 +1,7 @@
 #include "InfinitePlane.h"
 
 #include <limits>
-#include "mathsHelper.h"
+#include "MathsHelper.h"
 
 bool InfinitePlane::intersect(const Ray& ray, IntersectionResult& result) const
 {

@@ -3,6 +3,8 @@
 #include <new>
 
 #if !defined(_MSC_VER)
+#include <cstdlib>
+
 #define _aligned_malloc(size, alignment) aligned_alloc((alignment), (size))
 #define _aligned_free(ptr) free(ptr)
 #endif
