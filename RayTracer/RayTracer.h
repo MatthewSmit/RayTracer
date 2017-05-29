@@ -7,17 +7,15 @@
 #include <vector>
 
 struct IntersectionResult;
-
-static constexpr float WIDTH = 20.0f;
-static constexpr float HEIGHT = 20.0f;
-static constexpr float EDIST = 40.0f;
-static constexpr int NUMDIV = 500;
-static constexpr float XMIN = -WIDTH * 0.5f;
-static constexpr float XMAX = WIDTH * 0.5f;
-static constexpr float YMIN = -HEIGHT * 0.5f;
-static constexpr float YMAX = HEIGHT * 0.5f;
-
 struct Ray;
+
+struct Task
+{
+	int x;
+	int y;
+	int stride;
+	float* pixels;
+};
 
 class RayTracer
 {
@@ -39,6 +37,8 @@ public:
 
 	const float* getPixels() const { return pixelData.get(); }
 
+	int getSize() const;
+
 private:
 	std::vector<std::unique_ptr<SceneObject>> sceneObjects{};
 	std::vector<std::unique_ptr<Image>> images{};
@@ -48,12 +48,13 @@ private:
 	vec4 ambientColour;
 	vec4 backgroundColour;
 
+	bool antiAliasing = false;
 	int maximumSteps = 5;
 
 	vec4 calculateShadows(const Ray& lightRay, SceneObject* selfObject) const;
 	vec4 trace(const Ray& ray, SceneObject* selfObject, int step) const;
 	bool closestPoint(const Ray& ray, IntersectionResult& result, SceneObject*& hitObject, SceneObject* selfObject = nullptr) const;
 
-	void rayTraceNormal() const;
-	void rayTraceAA() const;
+	void rayTraceNormal(const std::vector<Task>& tasks) const;
+	void rayTraceAA(const std::vector<Task>& tasks) const;
 };

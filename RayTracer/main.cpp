@@ -6,43 +6,29 @@
 #include "JsonSceneLoader.h"
 
 static RayTracer rayTracer{};
+static GLuint texture{};
 
-//---The main display module -----------------------------------------------------------
-// In a ray tracing application, it just displays the ray traced image by drawing
-// each cell as a quad.
-//---------------------------------------------------------------------------------------
 void display()
 {
-	constexpr auto cellX = (XMAX - XMIN) / NUMDIV;  //cell width
-	constexpr auto cellY = (YMAX - YMIN) / NUMDIV;  //cell height
-
 	const auto start = std::chrono::high_resolution_clock::now();
 	rayTracer.rayTrace();
 	const auto end = std::chrono::high_resolution_clock::now();
 	const auto duration = std::chrono::duration_cast<std::chrono::duration<float>>(end - start).count();
 	printf("Took %f seconds\n", duration);
 
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, rayTracer.getSize(), rayTracer.getSize(), 0, GL_RGB, GL_FLOAT, rayTracer.getPixels());
+
 	glClear(GL_COLOR_BUFFER_BIT);
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-
-	glBegin(GL_QUADS);  //Each cell is a quad.
-
-	for (auto x = 0; x < NUMDIV; x++)
-	{
-		const auto xp = XMIN + x * cellX;
-		for (auto y = 0; y < NUMDIV; y++)
-		{
-			const auto yp = YMIN + y * cellY;
-
-			glColor3fv(rayTracer.getPixels() + (x + y * NUMDIV) * 3);
-			glVertex2f(xp, yp);				//Draw each cell with its colour value
-			glVertex2f(xp + cellX, yp);
-			glVertex2f(xp + cellX, yp + cellY);
-			glVertex2f(xp, yp + cellY);
-		}
-	}
-
+	glBegin(GL_QUADS);
+	glNormal3f(0, 0, 1);
+	glTexCoord2f(0, 0);
+	glVertex3f(-1, 1, 0);
+	glTexCoord2f(1, 0);
+	glVertex3f(1, 1, 0);
+	glTexCoord2f(1, 1);
+	glVertex3f(1, -1, 0);
+	glTexCoord2f(0, 1);
+	glVertex3f(-1, -1, 0);
 	glEnd();
 
 	glutPostRedisplay();
@@ -51,18 +37,21 @@ void display()
 
 void initialise()
 {
-	glMatrixMode(GL_PROJECTION);
-	gluOrtho2D(XMIN, XMAX, YMIN, YMAX);
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glEnable(GL_TEXTURE_2D);
 	glClearColor(0, 0, 0, 1);
 
-	loadSceneJson(&rayTracer, "scene6.json");
+	loadSceneJson(&rayTracer, "scene1.json");
 }
 
 int main(int argc, char *argv[])
 {
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
-	glutInitWindowSize(1000, 1000);
+	glutInitWindowSize(1024, 1024);
 	glutCreateWindow("Raytracer");
 
 	glutDisplayFunc(display);

@@ -13,6 +13,17 @@
 #include <cassert>
 #include <memory>
 
+static constexpr int WORK_SIZE = 8;
+
+static constexpr float WIDTH = 20.0f;
+static constexpr float HEIGHT = 20.0f;
+static constexpr float EDIST = 40.0f;
+static constexpr int NUMDIV = 512;
+static constexpr float XMIN = -WIDTH * 0.5f;
+static constexpr float XMAX = WIDTH * 0.5f;
+static constexpr float YMIN = -HEIGHT * 0.5f;
+static constexpr float YMAX = HEIGHT * 0.5f;
+
 RayTracer::RayTracer()
 {
 	pixelData = std::unique_ptr<float[]>{ new float[NUMDIV * NUMDIV * 3] };
@@ -22,8 +33,30 @@ RayTracer::~RayTracer() = default;
 
 void RayTracer::rayTrace() const
 {
-	rayTraceNormal();
-	//rayTraceAA();
+	assert((getSize() % WORK_SIZE) == 0);
+
+	auto workElements = getSize() / WORK_SIZE;
+	workElements *= workElements;
+
+	std::vector<Task> tasks{};
+	tasks.resize(workElements);
+
+	auto i = 0;
+	for (auto x = 0; x < getSize(); x += WORK_SIZE)
+	{
+		for (auto y = 0; y < getSize(); y += WORK_SIZE)
+		{
+			tasks[i].x = x;
+			tasks[i].y = y;
+			tasks[i].stride = getSize() * 3;
+			tasks[i].pixels = pixelData.get() + (x + y * getSize()) * 3;
+			i++;
+		}
+	}
+
+	if (antiAliasing)
+		rayTraceAA(tasks);
+	else rayTraceNormal(tasks);
 
 	//saveBmp("dmp.bmp");
 }
@@ -101,6 +134,11 @@ void RayTracer::saveBmp(const char* fileName) const
 	assert(saveResult == 1);
 }
 
+int RayTracer::getSize() const
+{
+	return NUMDIV;
+}
+
 //Finds the closest point of intersection of the current ray with scene objects
 bool RayTracer::closestPoint(const Ray& ray, IntersectionResult& result, SceneObject*& hitObject, SceneObject* selfObject) const
 {
@@ -130,70 +168,80 @@ bool RayTracer::closestPoint(const Ray& ray, IntersectionResult& result, SceneOb
 	return hitObject != nullptr;
 }
 
-void RayTracer::rayTraceNormal() const
+void RayTracer::rayTraceNormal(const std::vector<Task>& tasks) const
 {
 	constexpr auto cellX = (XMAX - XMIN) / NUMDIV;  //cell width
 	constexpr auto cellY = (YMAX - YMIN) / NUMDIV;  //cell height
 
 	const auto eye = vec4{ 0, 5, 0, 0 };  //The eye position (source of primary rays) is the origin
 
-	for (auto x = 0; x < NUMDIV; x++)
+	for (const auto& task : tasks)
 	{
-		const auto xp = XMIN + x * cellX;
-		for (auto y = 0; y < NUMDIV; y++)
+		for (auto y = 0; y < WORK_SIZE; y++)
 		{
-			const auto yp = YMIN + y * cellY;
+			auto pixelPtr = task.pixels + y * task.stride;
+			const auto yp = YMAX - (task.y + y) * cellY;
 
-			const auto direction = vec4{ xp + 0.5f * cellX, yp + 0.5f * cellY, -EDIST, 0 };	//direction of the primary ray
+			for (auto x = 0; x < WORK_SIZE; x++)
+			{
+				const auto xp = XMIN + (task.x + x) * cellX;
 
-			const auto ray = Ray{ eye, normalise(direction) };
-			const auto colour = trace(ray, nullptr, maximumSteps); //Trace the primary ray and get the colour value
+				const auto direction = vec4{ xp + 0.5f * cellX, yp + 0.5f * cellY, -EDIST, 0 };	//direction of the primary ray
 
-			pixelData[(x + y * NUMDIV) * 3 + 0] = colour.x;
-			pixelData[(x + y * NUMDIV) * 3 + 1] = colour.y;
-			pixelData[(x + y * NUMDIV) * 3 + 2] = colour.z;
+				const auto ray = Ray{ eye, normalise(direction) };
+				const auto colour = trace(ray, nullptr, maximumSteps); //Trace the primary ray and get the colour value
+
+				pixelPtr[x * 3 + 0] = colour.x;
+				pixelPtr[x * 3 + 1] = colour.y;
+				pixelPtr[x * 3 + 2] = colour.z;
+			}
 		}
 	}
 }
 
-void RayTracer::rayTraceAA() const
+void RayTracer::rayTraceAA(const std::vector<Task>& tasks) const
 {
 	constexpr auto cellX = (XMAX - XMIN) / NUMDIV;  //cell width
 	constexpr auto cellY = (YMAX - YMIN) / NUMDIV;  //cell height
 	constexpr auto cellX4 = cellX / 4;
 	constexpr auto cellY4 = cellY / 4;
 
-	auto eye = vec4{ 0, 5, 0, 0 };  //The eye position (source of primary rays) is the origin
+	const auto eye = vec4{ 0, 5, 0, 0 };  //The eye position (source of primary rays) is the origin
 
-	for (auto x = 0; x < NUMDIV; x++)
+	for (const auto& task : tasks)
 	{
-		const auto xp = XMIN + x * cellX;
-		for (auto y = 0; y < NUMDIV; y++)
+		for (auto y = 0; y < WORK_SIZE; y++)
 		{
-			const auto yp = YMIN + y * cellY;
+			auto pixelPtr = task.pixels + y * task.stride;
+			const auto yp = YMAX - (task.y + y) * cellY;
 
-			//direction of the primary ray
-			const auto direction1 = vec4{ xp + 0.5f * cellX - cellX4, yp + 0.5f * cellY + cellY4, -EDIST, 0 };
-			const auto direction2 = vec4{ xp + 0.5f * cellX - cellX4, yp + 0.5f * cellY - cellY4, -EDIST, 0 };
-			const auto direction3 = vec4{ xp + 0.5f * cellX + cellX4, yp + 0.5f * cellY + cellY4, -EDIST, 0 };
-			const auto direction4 = vec4{ xp + 0.5f * cellX + cellX4, yp + 0.5f * cellY - cellY4, -EDIST, 0 };
+			for (auto x = 0; x < WORK_SIZE; x++)
+			{
+				const auto xp = XMIN + (task.x + x) * cellX;
 
-			const auto ray1 = Ray{ eye, normalise(direction1) };
-			const auto ray2 = Ray{ eye, normalise(direction2) };
-			const auto ray3 = Ray{ eye, normalise(direction3) };
-			const auto ray4 = Ray{ eye, normalise(direction4) };
+				//direction of the primary ray
+				const auto direction1 = vec4{ xp + 0.5f * cellX - cellX4, yp + 0.5f * cellY + cellY4, -EDIST, 0 };
+				const auto direction2 = vec4{ xp + 0.5f * cellX - cellX4, yp + 0.5f * cellY - cellY4, -EDIST, 0 };
+				const auto direction3 = vec4{ xp + 0.5f * cellX + cellX4, yp + 0.5f * cellY + cellY4, -EDIST, 0 };
+				const auto direction4 = vec4{ xp + 0.5f * cellX + cellX4, yp + 0.5f * cellY - cellY4, -EDIST, 0 };
 
-			//Trace the primary ray and get the colour value
-			const auto colour1 = trace(ray1, nullptr, maximumSteps);
-			const auto colour2 = trace(ray2, nullptr, maximumSteps);
-			const auto colour3 = trace(ray3, nullptr, maximumSteps);
-			const auto colour4 = trace(ray4, nullptr, maximumSteps);
+				const auto ray1 = Ray{ eye, normalise(direction1) };
+				const auto ray2 = Ray{ eye, normalise(direction2) };
+				const auto ray3 = Ray{ eye, normalise(direction3) };
+				const auto ray4 = Ray{ eye, normalise(direction4) };
 
-			const auto colour = (colour1 + colour2 + colour3 + colour4) * 0.25f;
+				//Trace the primary ray and get the colour value
+				const auto colour1 = trace(ray1, nullptr, maximumSteps);
+				const auto colour2 = trace(ray2, nullptr, maximumSteps);
+				const auto colour3 = trace(ray3, nullptr, maximumSteps);
+				const auto colour4 = trace(ray4, nullptr, maximumSteps);
 
-			pixelData[(x + y * NUMDIV) * 3 + 0] = colour.x;
-			pixelData[(x + y * NUMDIV) * 3 + 1] = colour.y;
-			pixelData[(x + y * NUMDIV) * 3 + 2] = colour.z;
+				const auto colour = (colour1 + colour2 + colour3 + colour4) * 0.25f;
+
+				pixelPtr[x * 3 + 0] = colour.x;
+				pixelPtr[x * 3 + 1] = colour.y;
+				pixelPtr[x * 3 + 2] = colour.z;
+			}
 		}
 	}
 }
