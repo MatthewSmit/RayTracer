@@ -4,11 +4,11 @@
 class alignas(16) InfinitePlane final : public SceneObject
 {
 public:
-	InfinitePlane(const vec4& position, const vec4& normal, const Material& material) :
+	InfinitePlane(const vec4& position, const vec4& normal, std::unique_ptr<Material> material) :
+		SceneObject{ move(material) },
 		position(position),
 		normal(normal)
 	{
-		setMaterial(material);
 	}
 
 	bool intersect(const Ray& ray, IntersectionResult& result) const override;

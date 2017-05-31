@@ -4,12 +4,12 @@
 class alignas(16) Torus final : public SceneObject
 {
 public:
-	Torus(const vec4& position, float majorRadius, float minorRadius, const Material& material) :
+	Torus(const vec4& position, float majorRadius, float minorRadius, std::unique_ptr<Material> material) :
+		SceneObject{move(material)},
 		position(position),
 		majorRadius{ majorRadius },
 		minorRadius{ minorRadius }
 	{
-		setMaterial(material);
 	}
 
 	bool intersect(const Ray& ray, IntersectionResult& result) const override;

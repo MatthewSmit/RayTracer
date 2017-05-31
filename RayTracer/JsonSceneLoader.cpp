@@ -1,12 +1,16 @@
 #include "JsonSceneLoader.h"
 
+#include "Camera.h"
 #include "Cone.h"
 #include "Cylinder.h"
 #include "InfinitePlane.h"
 #include "Material.h"
 #include "Polygon.h"
 #include "RayTracer.h"
+#include "SolidMaterial.h"
 #include "Sphere.h"
+#include "StripedMaterial.h"
+#include "TexturedMaterial.h"
 #include "Torus.h"
 
 #include <rapidjson/document.h>
@@ -95,7 +99,7 @@ namespace
 		return vec4{ r, g, b, a };
 	}
 
-	Material parseSolid(const rapidjson::Value& material)
+	std::unique_ptr<Material> parseSolid(const rapidjson::Value& material)
 	{
 		auto colour = parseColour(material["colour"]);
 
@@ -107,14 +111,14 @@ namespace
 		if (material.HasMember("refractivity"))
 			refractivity = static_cast<float>(material["refractivity"].GetDouble());
 
-		auto specularity = DEFAULT_SPECULAR;
+		auto specularity = Material::DEFAULT_SPECULAR;
 		if (material.HasMember("specularity"))
 			specularity = static_cast<float>(material["specularity"].GetDouble());
 
-		return Material{ colour, reflectivity, refractivity, specularity };
+		return std::make_unique<SolidMaterial>(colour, reflectivity, refractivity, specularity);
 	}
 
-	Material parseTexture(RayTracer* rayTracer, const rapidjson::Value& material)
+	std::unique_ptr<Material> parseTexture(RayTracer* rayTracer, const rapidjson::Value& material)
 	{
 		auto path = material["path"].GetString();
 
@@ -132,14 +136,44 @@ namespace
 		if (material.HasMember("refractivity"))
 			refractivity = static_cast<float>(material["refractivity"].GetDouble());
 
-		auto specularity = DEFAULT_SPECULAR;
+		auto specularity = Material::DEFAULT_SPECULAR;
 		if (material.HasMember("specularity"))
 			specularity = static_cast<float>(material["specularity"].GetDouble());
 
-		return Material{ texture, scaling, reflectivity, refractivity, specularity };
+		return std::make_unique<TexturedMaterial>(texture, scaling, reflectivity, refractivity, specularity);
 	}
 
-	Material parseMaterial(RayTracer* rayTracer, const rapidjson::Value& material)
+	std::unique_ptr<Material> parsePatternStripe(RayTracer* rayTracer, const rapidjson::Value& material)
+	{
+		auto direction = material["direction"].GetString();
+
+		bool horizontal;
+		if (strcmp(direction, "horizontal") == 0)
+			horizontal = true;
+		else if (strcmp(direction, "vertical") == 0)
+			horizontal = false;
+		else throw std::exception();
+
+		auto multiplier = static_cast<float>(material["multiplier"].GetDouble());
+		auto colour1 = parseColour(material["colour1"]);
+		auto colour2 = parseColour(material["colour2"]);
+
+		float reflectivity = 0;
+		if (material.HasMember("reflectivity"))
+			reflectivity = static_cast<float>(material["reflectivity"].GetDouble());
+
+		float refractivity = 0;
+		if (material.HasMember("refractivity"))
+			refractivity = static_cast<float>(material["refractivity"].GetDouble());
+
+		auto specularity = Material::DEFAULT_SPECULAR;
+		if (material.HasMember("specularity"))
+			specularity = static_cast<float>(material["specularity"].GetDouble());
+
+		return std::make_unique<StripedMaterial>(horizontal, multiplier, colour1, colour2, reflectivity, refractivity, specularity);
+	}
+
+	std::unique_ptr<Material> parseMaterial(RayTracer* rayTracer, const rapidjson::Value& material)
 	{
 		auto type = material["type"].GetString();
 
@@ -147,6 +181,8 @@ namespace
 			return parseSolid(material);
 		if (strcmp(type, "texture") == 0)
 			return parseTexture(rayTracer, material);
+		if (strcmp(type, "pattern-stripe") == 0)
+			return parsePatternStripe(rayTracer, material);
 
 		throw std::exception();
 	}
@@ -157,7 +193,7 @@ namespace
 		auto radius = static_cast<float>(object["radius"].GetDouble());
 		auto material = parseMaterial(rayTracer, object["material"]);
 
-		rayTracer->add(std::make_unique<Sphere>(position, radius, material));
+		rayTracer->add(std::make_unique<Sphere>(position, radius, move(material)));
 	}
 
 	void parsePlane(RayTracer* rayTracer, const rapidjson::Value& object)
@@ -166,19 +202,19 @@ namespace
 		auto normal = parseVector(object["normal"]);
 		auto material = parseMaterial(rayTracer, object["material"]);
 
-		rayTracer->add(std::make_unique<InfinitePlane>(position, normal, material));
+		rayTracer->add(std::make_unique<InfinitePlane>(position, normal, move(material)));
 	}
 
-	std::unique_ptr<SceneObject> createPolygon(vec4* points, vec4* texCoords, int size, const Material& material)
+	std::unique_ptr<SceneObject> createPolygon(vec4* points, vec4* texCoords, int size, std::unique_ptr<Material> material)
 	{
 		SceneObject* object = nullptr;
 		switch (size)
 		{
 		case 3:
-			object = new Polygon<3>(points, texCoords, material);
+			object = new Polygon<3>(points, texCoords, move(material));
 			break;
 		case 4:
-			object = new Polygon<4>(points, texCoords, material);
+			object = new Polygon<4>(points, texCoords, move(material));
 			break;
 		default:
 			throw std::exception();
@@ -190,7 +226,7 @@ namespace
 	void parsePolygon(RayTracer* rayTracer, const rapidjson::Value& object)
 	{
 		auto& jsonPoints = object["points"];
-		const auto material = parseMaterial(rayTracer, object["material"]);
+		auto material = parseMaterial(rayTracer, object["material"]);
 
 		const auto numberPoints = jsonPoints.Capacity();
 		const auto points = std::unique_ptr<vec4[]>{ new vec4[numberPoints] };
@@ -208,7 +244,7 @@ namespace
 				texCoords[i] = parseVector(jsonTexCoords[i]);
 		}
 
-		rayTracer->add(createPolygon(points.get(), texCoords.get(), numberPoints, material));
+		rayTracer->add(createPolygon(points.get(), texCoords.get(), numberPoints, move(material)));
 	}
 
 	void parseCylinder(RayTracer* rayTracer, const rapidjson::Value& object)
@@ -218,7 +254,7 @@ namespace
 		auto height = static_cast<float>(object["height"].GetDouble());
 		auto material = parseMaterial(rayTracer, object["material"]);
 
-		rayTracer->add(std::make_unique<Cylinder>(position, radius, height, material));
+		rayTracer->add(std::make_unique<Cylinder>(position, radius, height, move(material)));
 	}
 
 	void parseCone(RayTracer* rayTracer, const rapidjson::Value& object)
@@ -228,7 +264,7 @@ namespace
 		auto height = static_cast<float>(object["height"].GetDouble());
 		auto material = parseMaterial(rayTracer, object["material"]);
 
-		rayTracer->add(std::make_unique<Cone>(position, radius, height, material));
+		rayTracer->add(std::make_unique<Cone>(position, radius, height, move(material)));
 	}
 
 	void parseTorus(RayTracer* rayTracer, const rapidjson::Value& object)
@@ -238,7 +274,7 @@ namespace
 		auto minorRadius = static_cast<float>(object["minorRadius"].GetDouble());
 		auto material = parseMaterial(rayTracer, object["material"]);
 
-		rayTracer->add(std::make_unique<Torus>(position, majorRadius, minorRadius, material));
+		rayTracer->add(std::make_unique<Torus>(position, majorRadius, minorRadius, move(material)));
 	}
 
 	void parseObject(RayTracer* rayTracer, const rapidjson::Value& object)
@@ -292,6 +328,24 @@ namespace
 		else
 			throw std::exception();
 	}
+
+	Camera parseCamera(const rapidjson::Value& object)
+	{
+		auto position = vec4{ 0, 0, 0, 0 };
+		auto direction = vec4{ 0, 0, -1, 0 };
+		auto up = vec4{ 0, 1, 0, 0 };
+
+		if (object.HasMember("position"))
+			position = parseVector(object["position"]);
+
+		if (object.HasMember("direction"))
+			direction = parseVector(object["direction"]);
+
+		if (object.HasMember("up"))
+			up = parseVector(object["up"]);
+
+		return Camera{ position, direction, up };
+	}
 }
 
 void loadSceneJson(RayTracer* rayTracer, const char* fileName)
@@ -317,10 +371,13 @@ void loadSceneJson(RayTracer* rayTracer, const char* fileName)
 		throw std::exception();
 	}
 
+	const auto& camera = json["camera"];
 	const auto& objects = json["objects"];
 	const auto& lights = json["lights"];
 	const auto& ambientColour = json["ambientColour"];
 	const auto& backgroundColour = json["backgroundColour"];
+
+	rayTracer->setCamera(parseCamera(camera));
 
 	for (auto i = objects.Begin(); i != objects.End(); i++)
 		parseObject(rayTracer, *i);

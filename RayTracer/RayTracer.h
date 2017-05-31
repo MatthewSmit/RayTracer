@@ -1,4 +1,5 @@
 #pragma once
+#include "Camera.h"
 #include "Image.h"
 #include "Light.h"
 #include "SceneObject.h"
@@ -8,6 +9,7 @@
 #include <thread>
 #include <vector>
 #include <atomic>
+#include "Camera.h"
 
 struct IntersectionResult;
 struct Ray;
@@ -37,10 +39,16 @@ public:
 	Image* loadTexture(const char* path);
 	void saveBmp(const char* fileName) const;
 
-	void setAmbientColour(const vec4& colour) { ambientColour = colour; }
-	void setBackgroundColour(const vec4& colour) { backgroundColour = colour; }
-	void setAntiAliasing(bool value) { antiAliasing = value; }
+	void setAmbientColour(const vec4& value) { ambientColour = value; }
+	void setAntiAliasing(bool value);
+	void setBackgroundColour(const vec4& value) { backgroundColour = value; }
+	void setCamera(const Camera& value) { camera = value; }
 	void setSize(int size);
+
+	bool isRayTraceDone() const
+	{
+		return tasksDone == tasks.size();
+	}
 
 	const float* getPixels() const { return pixelData.get(); }
 
@@ -55,7 +63,7 @@ private:
 	std::vector<Task> tasks{};
 	std::vector<std::thread> threads{};
 
-	vec4 eye{};
+	Camera camera{};
 
 	vec4 ambientColour;
 	vec4 backgroundColour;

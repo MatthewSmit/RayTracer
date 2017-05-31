@@ -16,12 +16,12 @@ template<int size>
 class alignas(16) Polygon final : public SceneObject
 {
 public:
-	Polygon(const vec4* points, const vec4* texCoords, const Material& material)
+	Polygon(const vec4* points, const vec4* texCoords, std::unique_ptr<Material> material) :
+		SceneObject{move(material)}
 	{
 		memcpy(this->points, points, sizeof(vec4) * size);
 		memcpy(this->texCoords, texCoords, sizeof(vec4) * size);
 		normal = calculateNormal(points[0], points[1], points[2]);
-		setMaterial(material);
 	}
 
 	bool intersect(const Ray& ray, IntersectionResult& result) const override

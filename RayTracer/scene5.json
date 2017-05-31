@@ -1,32 +1,20 @@
 {
+  "camera": {
+    "position": [ 0, 5, 0 ],
+    "direction": [ 0, 0, -1 ],
+    "up": [ 0, 1, 0 ]
+  },
   "objects": [
-    {
-      "type": "cylinder",
-      "position": [ 0, -15, -80 ],
-      "radius": 2,
-      "height": 5,
-      "material": {
-        "type": "solid",
-        "colour": [ 1, 0, 0, 0 ]
-      }
-    },
-    {
-      "type": "torus",
-      "position": [ -10, 0, -60 ],
-      "majorRadius": 2,
-      "minorRadius": 3,
-      "material": {
-        "type": "solid",
-        "colour": [ 1, 0, 0, 0 ]
-      }
-    },
     {
       "type": "sphere",
       "position": [ 0, 15, -80 ],
       "radius": 5,
       "material": {
-        "type": "solid",
-        "colour": [ 1, 0, 0, 0 ]
+        "type": "pattern-stripe",
+        "direction": "horizontal",
+        "multiplier": 10, 
+        "colour1": [ 1, 0, 0 ],
+        "colour2": [ 0, 1, 0 ]
       }
     }
   ],

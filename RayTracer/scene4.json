@@ -1,18 +1,13 @@
 {
+  "camera": {
+    "position": [ 0, 5, 0 ],
+    "direction": [ 0, 0, -1 ],
+    "up": [ 0, 1, 0 ]
+  },
   "objects": [
     {
       "type": "cylinder",
       "position": [ 0, -15, -80 ],
-      "radius": 2,
-      "height": 5,
-      "material": {
-        "type": "solid",
-        "colour": [ 1, 0, 0, 0 ]
-      }
-    },
-    {
-      "type": "cone",
-      "position": [ -10, -15, -80 ],
       "radius": 2,
       "height": 5,
       "material": {

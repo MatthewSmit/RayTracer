@@ -4,11 +4,11 @@
 class alignas(16) Sphere final : public SceneObject
 {
 public:
-	Sphere(const vec4& center, float radius, const Material& material) :
+	Sphere(const vec4& center, float radius, std::unique_ptr<Material> material) :
+		SceneObject{ move(material) },
 		center(center),
 		radius(radius)
 	{
-		setMaterial(material);
 	}
 
 	bool intersect(const Ray& ray, IntersectionResult& result) const override;

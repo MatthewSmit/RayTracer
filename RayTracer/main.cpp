@@ -11,13 +11,15 @@ static GLuint texture{};
 void renderString(float x, float y, const char* string)
 {
 	glColor3f(0.5f, 1, 0.5f);
-	glRasterPos2f(x - 1, -(y - 1 + 0.05));
+	glRasterPos2f(x - 1, -(y - 1 + 0.05f));
 
 	glutBitmapString(GLUT_BITMAP_TIMES_ROMAN_24, reinterpret_cast<const unsigned char*>(string));
 }
 
 void display()
 {
+	//if (rayTracer.isRayTraceDone())
+	//	rayTracer.startRayTrace();
 	const auto start = std::chrono::high_resolution_clock::now();
 	rayTracer.rayTrace();
 	const auto end = std::chrono::high_resolution_clock::now();
@@ -83,7 +85,7 @@ void initialise()
 	glEnable(GL_TEXTURE_2D);
 	glClearColor(0, 0, 0, 1);
 
-	loadSceneJson(&rayTracer, "scene7.json");
+	loadSceneJson(&rayTracer, "scene1.json");
 }
 
 int main(int argc, char *argv[])

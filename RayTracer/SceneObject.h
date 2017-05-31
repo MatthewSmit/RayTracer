@@ -3,6 +3,7 @@
 #include "Material.h"
 #include "Ray.h"
 #include "vec4.h"
+#include <memory>
 
 struct IntersectionResult
 {
@@ -14,6 +15,10 @@ struct IntersectionResult
 class SceneObject : public AlignedObject
 {
 public:
+	explicit SceneObject(std::unique_ptr<Material> material) :
+		material{ move(material) }
+	{
+	}
 	virtual ~SceneObject() = default;
 
 	virtual bool intersect(const Ray& ray, IntersectionResult& result) const = 0;
@@ -21,15 +26,11 @@ public:
 
 	virtual vec4 getTextureCoordinates(const vec4& hitPoint) const = 0;
 
-	const Material& getMaterial() const
+	const Material* getMaterial() const
 	{
-		return material;
-	}
-	void setMaterial(const Material& material)
-	{
-		this->material = material;
+		return material.get();
 	}
 
 private:
-	Material material{ vec4{ 0, 0, 0, 1 } };
+	std::unique_ptr<Material> material{};
 };

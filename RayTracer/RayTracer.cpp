@@ -29,7 +29,6 @@ static constexpr int THREADS = 4;
 RayTracer::RayTracer()
 {
 	size = DEFAULT_SIZE;
-	eye = vec4{ 0, 5, 0, 0 };
 	pixelData = std::unique_ptr<float[]>{ new float[size * size * 3] };
 
 	running = true;
@@ -60,9 +59,6 @@ void RayTracer::startRayTrace()
 	}
 
 	workConditionVariable.notify_all();
-
-	while (tasksDone < tasks.size())
-		continue;
 }
 void RayTracer::rayTrace()
 {
@@ -152,8 +148,23 @@ void RayTracer::saveBmp(const char* fileName) const
 	assert(saveResult == 1);
 }
 
+void RayTracer::setAntiAliasing(bool value)
+{
+	// Wait for raytrace to be done
+	//while (!isRayTraceDone())
+	//{
+	//}
+
+	antiAliasing = value;
+}
+
 void RayTracer::setSize(int size)
 {
+	// Wait for raytrace to be done
+	//while (!isRayTraceDone())
+	//{
+	//}
+
 	this->size = size;
 	pixelData = std::unique_ptr<float[]>{ new float[size * size * 3] };
 }
@@ -233,7 +244,7 @@ void RayTracer::rayTraceNormal(const Task& task) const
 
 			const auto direction = vec4{ xp + 0.5f * cellX, yp + 0.5f * cellY, -EDIST, 0 };	//direction of the primary ray
 
-			const auto ray = Ray{ eye, normalise(direction) };
+			const auto ray = Ray{ camera.position, normalise(direction) };
 			const auto colour = trace(ray, nullptr, maximumSteps); //Trace the primary ray and get the colour value
 
 			pixelPtr[x * 3 + 0] = colour.x;
@@ -265,10 +276,10 @@ void RayTracer::rayTraceAA(const Task& task) const
 			const auto direction3 = vec4{ xp + 0.5f * cellX + cellX4, yp + 0.5f * cellY + cellY4, -EDIST, 0 };
 			const auto direction4 = vec4{ xp + 0.5f * cellX + cellX4, yp + 0.5f * cellY - cellY4, -EDIST, 0 };
 
-			const auto ray1 = Ray{ eye, normalise(direction1) };
-			const auto ray2 = Ray{ eye, normalise(direction2) };
-			const auto ray3 = Ray{ eye, normalise(direction3) };
-			const auto ray4 = Ray{ eye, normalise(direction4) };
+			const auto ray1 = Ray{ camera.position, normalise(direction1) };
+			const auto ray2 = Ray{ camera.position, normalise(direction2) };
+			const auto ray3 = Ray{ camera.position, normalise(direction3) };
+			const auto ray4 = Ray{ camera.position, normalise(direction4) };
 
 			//Trace the primary ray and get the colour value
 			const auto colour1 = trace(ray1, nullptr, maximumSteps);
@@ -320,10 +331,10 @@ vec4 RayTracer::calculateShadows(const Ray& lightRay, SceneObject* selfObject) c
 	vec4 allowedLight{ 1 };
 	while (closestPoint(newLightRay, result, hitObject, selfObject))
 	{
-		const auto& material = hitObject->getMaterial();
-		if (material.IsTransparent)
+		const auto material = hitObject->getMaterial();
+		if (material->isTransparent)
 		{
-			auto colour = material.getColour(result.point, hitObject);
+			const auto colour = material->getColour(result.point, hitObject);
 			if (colour.w > 0)
 			{
 				allowedLight *= colour / colour.w * (1 - colour.w);
@@ -349,8 +360,8 @@ vec4 RayTracer::trace(const Ray& ray, SceneObject* selfObject, int step) const
 	if (!closestPoint(ray, result, hitObject, selfObject))
 		return backgroundColour;
 
-	const auto& material = hitObject->getMaterial();
-	const auto colour = material.getColour(result.point, hitObject);
+	const auto material = hitObject->getMaterial();
+	const auto colour = material->getColour(result.point, hitObject);
 
 	const auto ambientResult = ambientColour * colour;
 
@@ -369,9 +380,9 @@ vec4 RayTracer::trace(const Ray& ray, SceneObject* selfObject, int step) const
 
 			const auto reflectionVector = reflect(light.direction.direction, result.normal);
 			float specularResult;
-			if (material.Specularity == 0)
+			if (material->specularity == 0)
 				specularResult = 0;
-			else specularResult = powf(std::max(dot(reflectionVector, -ray.direction), 0.0f), material.Specularity);
+			else specularResult = powf(std::max(dot(reflectionVector, -ray.direction), 0.0f), material->specularity);
 
 			intensity += (diffuseResult + specularResult) * shadowLevel;
 			break;
@@ -385,13 +396,13 @@ vec4 RayTracer::trace(const Ray& ray, SceneObject* selfObject, int step) const
 			const auto shadowLevel = calculateShadows(lightRay, hitObject);
 
 			const auto attenuation = light.point.attenuation[0] + light.point.attenuation[1] * distance + light.point.attenuation[2] * distance * distance;
-			const auto diffuseResult = (saturate(dot(direction, result.normal)) * light.point.colour * colour) / attenuation;
+			const auto diffuseResult = saturate(dot(direction, result.normal)) * light.point.colour * colour / attenuation;
 
 			const auto reflectionVector = reflect(-direction, result.normal);
 			float specularResult;
-			if (material.Specularity == 0)
+			if (material->specularity == 0)
 				specularResult = 0;
-			else specularResult = powf(std::max(dot(reflectionVector, -ray.direction), 0.0f), material.Specularity);
+			else specularResult = powf(std::max(dot(reflectionVector, -ray.direction), 0.0f), material->specularity);
 
 			intensity += (diffuseResult + specularResult) * shadowLevel;
 			break;
@@ -402,14 +413,14 @@ vec4 RayTracer::trace(const Ray& ray, SceneObject* selfObject, int step) const
 		}
 	}
 
-	if (material.Reflectivity > 0)
+	if (material->reflectivity > 0)
 	{
 		const Ray reflectionRay{ result.point, reflect(ray.direction, result.normal) };
 		const auto reflectionColour = trace(reflectionRay, hitObject, step - 1);
-		intensity = colour + reflectionColour * material.Reflectivity;
+		intensity += reflectionColour * material->reflectivity;
 	}
 
-	const auto refractivity = material.Refractivity;
+	const auto refractivity = material->refractivity;
 	if (refractivity != 0)
 	{
 		Ray refractionRay;

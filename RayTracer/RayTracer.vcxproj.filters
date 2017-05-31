@@ -17,6 +17,11 @@
     <ClInclude Include="Polygon.h" />
     <ClInclude Include="Torus.h" />
     <ClInclude Include="AlignedObject.h" />
+    <ClInclude Include="Camera.h" />
+    <ClInclude Include="mat4.h" />
+    <ClInclude Include="SolidMaterial.h" />
+    <ClInclude Include="TexturedMaterial.h" />
+    <ClInclude Include="StripedMaterial.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="RayTracer.cpp" />
@@ -26,11 +31,12 @@
     <ClCompile Include="Cylinder.cpp" />
     <ClCompile Include="Image.cpp" />
     <ClCompile Include="JsonSceneLoader.cpp" />
-    <ClCompile Include="Material.cpp" />
     <ClCompile Include="Polygon.cpp" />
     <ClCompile Include="Sphere.cpp" />
     <ClCompile Include="Torus.cpp" />
     <ClCompile Include="AlignedObject.cpp" />
+    <ClCompile Include="TexturedMaterial.cpp" />
+    <ClCompile Include="StripedMaterial.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="scene3.json" />
@@ -41,5 +47,6 @@
     <None Include="scene1.json" />
     <None Include="scene5.json" />
     <None Include="scene6.json" />
+    <None Include="scene7.json" />
   </ItemGroup>
 </Project>

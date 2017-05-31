@@ -2,6 +2,20 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "type": "object",
   "properties": {
+    "camera": {
+      "properties": {
+        "position": {
+          "$ref": "#/definitions/vector"
+        },
+        "direction": {
+          "$ref": "#/definitions/vector"
+        },
+        "up": {
+          "$ref": "#/definitions/vector"
+        }
+      },
+      "additionalProperties": false
+    },
     "objects": {
       "type": "array",
       "items": {
@@ -76,7 +90,8 @@
     "material": {
       "oneOf": [
         { "$ref": "#/definitions/solidMaterial" },
-        { "$ref": "#/definitions/textureMaterial" }
+        { "$ref": "#/definitions/textureMaterial" },
+        { "$ref": "#/definitions/stripedMaterial" }
       ]
     },
     "solidMaterial": {
@@ -114,12 +129,57 @@
         "scaling": {
           "$ref": "#/definitions/vector"
         },
+        "reflectivity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "refractivity": {
+          "minimum": -1,
+          "maximum": 1
+        },
         "specularity": {
           "type": "number"
         }
       },
       "additionalProperties": false,
       "required": [ "type", "path" ]
+    },
+    "stripedMaterial": {
+      "properties": {
+        "type": {
+          "enum": [ "pattern-stripe" ]
+        },
+        "direction": {
+          "enum": [
+            "horizontal",
+            "vertical"
+          ]
+        },
+        "multiplier": {
+          "type": "number"
+        },
+        "colour1": {
+          "$ref": "#/definitions/colour"
+        },
+        "colour2": {
+          "$ref": "#/definitions/colour"
+        },
+        "reflectivity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "refractivity": {
+          "minimum": -1,
+          "maximum": 1
+        },
+        "specularity": {
+          "type": "number"
+        }
+      },
+      "additionalProperties": false,
+      "required": [ "type", "direction", "multiplier", "colour1", "colour2" ]
     },
     "sphere": {
       "properties": {

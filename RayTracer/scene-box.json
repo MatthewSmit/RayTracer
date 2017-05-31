@@ -1,0 +1,41 @@
+{
+  "camera": {
+	"position": [ 4, 0, 0],
+	"direction": [ -1, 0, 0],
+	"up": [ 0, 1, 0]
+  },
+  "objects": [
+    {
+      "type": "sphere",
+      "position": [ -5, 10, -90 ],
+      "radius": 5,
+      "material": {
+        "type": "texture",
+        "path": "box_map1.bmp",
+        "specularity": 76.8
+      }
+    }
+  ],
+  "ambientColour": {},
+  "backgroundColour": {},
+  "lights": [
+    {
+      "type": "point",
+      "position": [ 4, 4, 0 ],
+      "colour": [ 0.5, 0.5, 0.5 ],
+      "attenuation-constant": 0.25,
+      "attenuation-linear": 0.003372407,
+      "attenuation-quadratic": 0.000045492
+    },
+    {
+      "type": "direction",
+      "direction": [ 0, -1, 0 ],
+      "colour": [ 1, 1, 1 ]
+    },
+    {
+      "type": "direction",
+      "direction": [ 0, 1, 0 ],
+      "colour": [ 0.2, 0.2, 0.2 ]
+    }
+  ]
+}
