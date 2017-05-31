@@ -79,7 +79,7 @@ private:
 	std::atomic_int tasksDone;
 	int size;
 
-	vec4 calculateShadows(const Ray& lightRay, SceneObject* selfObject) const;
+	vec4 calculateShadows(const Ray& lightRay, SceneObject* selfObject, int step) const;
 	vec4 trace(const Ray& ray, SceneObject* selfObject, int step) const;
 	bool closestPoint(const Ray& ray, IntersectionResult& result, SceneObject*& hitObject, SceneObject* selfObject = nullptr) const;
 

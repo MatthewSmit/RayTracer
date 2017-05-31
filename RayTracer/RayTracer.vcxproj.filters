@@ -48,5 +48,6 @@
     <None Include="scene5.json" />
     <None Include="scene6.json" />
     <None Include="scene7.json" />
+    <None Include="scene-assignment.json" />
   </ItemGroup>
 </Project>

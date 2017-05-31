@@ -322,7 +322,7 @@ void RayTracer::threadFunc(RayTracer* rayTracer)
 	}
 }
 
-vec4 RayTracer::calculateShadows(const Ray& lightRay, SceneObject* selfObject) const
+vec4 RayTracer::calculateShadows(const Ray& lightRay, SceneObject* selfObject, int step) const
 {
 	IntersectionResult result{};
 	SceneObject* hitObject;
@@ -331,17 +331,19 @@ vec4 RayTracer::calculateShadows(const Ray& lightRay, SceneObject* selfObject) c
 	vec4 allowedLight{ 1 };
 	while (closestPoint(newLightRay, result, hitObject, selfObject))
 	{
+		if (step < 0)
+			return allowedLight;
+		step--;
+
 		const auto material = hitObject->getMaterial();
 		if (material->isTransparent)
 		{
 			const auto colour = material->getColour(result.point, hitObject);
 			if (colour.w > 0)
-			{
 				allowedLight *= colour / colour.w * (1 - colour.w);
 
-				newLightRay.position = result.point;
-				selfObject = hitObject;
-			}
+			newLightRay.position = result.point;
+			selfObject = hitObject;
 		}
 		else return vec4{ 0 };
 	}
@@ -374,7 +376,7 @@ vec4 RayTracer::trace(const Ray& ray, SceneObject* selfObject, int step) const
 		case LightType::Direction:
 		{
 			const Ray lightRay{ result.point, -light.direction.direction };
-			const auto shadowLevel = calculateShadows(lightRay, hitObject);
+			const auto shadowLevel = calculateShadows(lightRay, hitObject, step - 1);
 
 			const auto diffuseResult = saturate(dot(-light.direction.direction, result.normal)) * light.direction.colour * colour;
 
@@ -393,7 +395,7 @@ vec4 RayTracer::trace(const Ray& ray, SceneObject* selfObject, int step) const
 			const auto distance = length(difference);
 			const auto direction = normalise(difference);
 			const Ray lightRay{ result.point, direction };
-			const auto shadowLevel = calculateShadows(lightRay, hitObject);
+			const auto shadowLevel = calculateShadows(lightRay, hitObject, step - 1);
 
 			const auto attenuation = light.point.attenuation[0] + light.point.attenuation[1] * distance + light.point.attenuation[2] * distance * distance;
 			const auto diffuseResult = saturate(dot(direction, result.normal)) * light.point.colour * colour / attenuation;

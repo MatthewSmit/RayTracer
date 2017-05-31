@@ -365,6 +365,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="scene-assignment.json" />
     <None Include="scene1.json" />
     <None Include="scene2.json" />
     <None Include="scene3.json" />
@@ -391,7 +392,7 @@
   </Target>
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties scene2_1json__JSONSchema="sceneSchema.json" scene1_1json__JSONSchema="sceneSchema.json" scene6_1json__JSONSchema="sceneSchema.json" scene5_1json__JSONSchema="sceneSchema.json" sceneSchema_1json__JSONSchema="http://json-schema.org/draft-04/schema" scene3_1json__JSONSchema="sceneSchema.json" scene4_1json__JSONSchema="sceneSchema.json" />
+      <UserProperties scene2_1json__JSONSchema="sceneSchema.json" scene1_1json__JSONSchema="sceneSchema.json" scene6_1json__JSONSchema="sceneSchema.json" scene5_1json__JSONSchema="sceneSchema.json" scene-assignment_1json__JSONSchema="sceneSchema.json" sceneSchema_1json__JSONSchema="http://json-schema.org/draft-04/schema" scene3_1json__JSONSchema="sceneSchema.json" scene4_1json__JSONSchema="sceneSchema.json" />
     </VisualStudio>
   </ProjectExtensions>
 </Project>

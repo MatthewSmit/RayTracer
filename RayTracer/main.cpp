@@ -85,7 +85,7 @@ void initialise()
 	glEnable(GL_TEXTURE_2D);
 	glClearColor(0, 0, 0, 1);
 
-	loadSceneJson(&rayTracer, "scene1.json");
+	loadSceneJson(&rayTracer, "scene-assignment.json");
 }
 
 int main(int argc, char *argv[])

@@ -1,0 +1,186 @@
+{
+  "camera": {
+    "position": [ 0, 5, 0 ],
+    "direction": [ 0, 0, -1 ],
+    "up": [ 0, 1, 0 ]
+  },
+  "objects": [
+    {
+      "type": "sphere",
+      "position": [ -5, 15, -60 ],
+      "radius": 5,
+      "material": {
+        "type": "texture",
+        "path": "world.200412.3x5400x2700.png",
+        "specularity": 0
+      }
+    },
+    {
+      "type": "sphere",
+      "position": [ 10, 5, -70 ],
+      "radius": 3,
+      "material": {
+        "type": "solid",
+        "colour": [ 0, 0, 0 ],
+        "reflectivity": 1
+      }
+    },
+    {
+      "type": "sphere",
+      "position": [ 3, 8, -30 ],
+      "radius": 1,
+      "material": {
+        "type": "pattern-stripe",
+        "direction": "horizontal",
+        "multiplier": 10,
+        "colour1": [ 1, 0, 0 ],
+        "colour2": [ 0, 1, 0 ]
+      }
+    },
+    {
+      "type": "polygon",
+      "points": [
+        [ -20, 25, -80 ],
+        [ 20, 25, -80 ],
+        [ 20, -15, -80 ],
+        [ -20, -15, -80 ]
+      ],
+      "texCoords": [
+        [ 0, 1 ],
+        [ 1, 1 ],
+        [ 1, 0 ],
+        [ 0, 0 ]
+      ],
+      "material": {
+        "type": "texture",
+        "path": "TropicalSunnyDayFront2048.png"
+      }
+    },
+    {
+      "type": "plane",
+      "position": {},
+      "normal": [ 0, 1, 0 ],
+      "material": {
+        "type": "solid",
+        "colour": [ 0.5, 0.5, 0.5 ]
+      }
+    },
+    {
+      "type": "polygon",
+      "points": [
+        [ -6, 10, -40 ],
+        [ -4, 10, -40 ],
+        [ -4, 8, -40 ],
+        [ -6, 8, -40 ]
+      ],
+      "material": {
+        "type": "solid",
+        "colour": [ 1, 0, 0 ]
+      }
+    },
+    {
+      "type": "polygon",
+      "points": [
+        [ -4, 10, -40 ],
+        [ -4, 10, -42 ],
+        [ -4, 8, -42 ],
+        [ -4, 8, -40 ]
+      ],
+      "material": {
+        "type": "solid",
+        "colour": [ 0, 1, 0 ]
+      }
+    },
+    {
+      "type": "polygon",
+      "points": [
+        [ -6, 10, -42 ],
+        [ -6, 10, -40 ],
+        [ -6, 8, -40 ],
+        [ -6, 8, -42 ]
+      ],
+      "material": {
+        "type": "solid",
+        "colour": [ 1, 1, 0 ]
+      }
+    },
+    {
+      "type": "polygon",
+      "points": [
+        [ -4, 10, -42 ],
+        [ -6, 10, -42 ],
+        [ -6, 8, -42 ],
+        [ -4, 8, -42 ]
+      ],
+      "material": {
+        "type": "solid",
+        "colour": [ 0, 0, 1 ]
+      }
+    },
+    {
+      "type": "polygon",
+      "points": [
+        [ -4, 10, -42 ],
+        [ -6, 10, -42 ],
+        [ -6, 10, -40 ],
+        [ -4, 10, -40 ]
+      ],
+      "material": {
+        "type": "solid",
+        "colour": [ 0, 1, 1 ]
+      }
+    },
+    {
+      "type": "polygon",
+      "points": [
+        [ -4, 8, -42 ],
+        [ -6, 8, -42 ],
+        [ -6, 8, -40 ],
+        [ -4, 8, -40 ]
+      ],
+      "material": {
+        "type": "solid",
+        "colour": [ 1, 1, 1 ]
+      }
+    },
+    {
+      "type": "cylinder",
+      "position": [ 0, 0, -30 ],
+      "radius": 1,
+      "height": 2,
+      "material": {
+        "type": "solid",
+        "colour": [ 0, 1, 0 ]
+      }
+    },
+    {
+      "type": "sphere",
+      "position": [ 0, 5, -30 ],
+      "radius": 1,
+      "material": {
+        "type": "solid",
+        "colour": [ 0, 0, 0, 0 ],
+        "refractivity": 0.9
+      }
+    }
+  ],
+  "ambientColour": [ 0.2, 0.2, 0.2 ],
+  "backgroundColour": {},
+  "lights": [
+    {
+      "type": "direction",
+      "direction": [ -5, -40, -30 ],
+      "colour": [ 1, 0, 0 ]
+    },
+    {
+      "type": "direction",
+      "direction": [ -10, -40, -30 ],
+      "colour": [ 0, 1, 0 ]
+    },
+    {
+      "type": "direction",
+      "direction": [ -15, -40, -30 ],
+      "colour": [ 0, 0, 1 ]
+    }
+  ]
+}
