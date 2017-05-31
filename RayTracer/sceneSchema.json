@@ -22,7 +22,8 @@
       "items": {
         "type": "object",
         "oneOf": [
-          { "$ref": "#/definitions/directionLight" }
+          { "$ref": "#/definitions/directionLight" },
+          { "$ref": "#/definitions/pointLight" }
         ]
       },
       "uniqueItems": true
@@ -269,6 +270,30 @@
       },
       "additionalProperties": false,
       "required": [ "type", "direction", "colour" ]
+    },
+    "pointLight": {
+      "properties": {
+        "type": {
+          "enum": [ "point" ]
+        },
+        "position": {
+          "$ref": "#/definitions/vector"
+        },
+        "colour": {
+          "$ref": "#/definitions/colour"
+        },
+        "attenuation-constant": {
+          "type": "number"
+        },
+        "attenuation-linear": {
+          "type": "number"
+        },
+        "attenuation-quadratic": {
+          "type": "number"
+        }
+      },
+      "additionalProperties": false,
+      "required": [ "type", "position", "colour", "attenuation-constant", "attenuation-linear", "attenuation-quadratic" ]
     }
   },
   "additionalProperties": false,

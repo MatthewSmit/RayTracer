@@ -269,12 +269,26 @@ namespace
 		rayTracer->addDirectionLight(direction, colour);
 	}
 
+	void parsePointLight(RayTracer* rayTracer, const rapidjson::Value& object)
+	{
+		auto position = parseVector(object["position"]);
+		auto colour = parseColour(object["colour"]);
+		float attenuation[3];
+		attenuation[0] = static_cast<float>(object["attenuation-constant"].GetDouble());
+		attenuation[1] = static_cast<float>(object["attenuation-linear"].GetDouble());
+		attenuation[2] = static_cast<float>(object["attenuation-quadratic"].GetDouble());
+
+		rayTracer->addPointLight(position, colour, attenuation);
+	}
+
 	void parseLight(RayTracer* rayTracer, const rapidjson::Value& object)
 	{
 		auto type = object["type"].GetString();
 
 		if (strcmp(type, "direction") == 0)
 			parseDirectionLight(rayTracer, object);
+		else if (strcmp(type, "point") == 0)
+			parsePointLight(rayTracer, object);
 		else
 			throw std::exception();
 	}
