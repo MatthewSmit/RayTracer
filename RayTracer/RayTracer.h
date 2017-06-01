@@ -4,12 +4,11 @@
 #include "Light.h"
 #include "SceneObject.h"
 
+//#include <atomic>
 #include <memory>
-#include <mutex>
-#include <thread>
+//#include <mutex>
+//#include <thread>
 #include <vector>
-#include <atomic>
-#include "Camera.h"
 
 struct IntersectionResult;
 struct Ray;
@@ -28,7 +27,7 @@ public:
 	RayTracer();
 	~RayTracer();
 
-	void startRayTrace();
+	//void startRayTrace();
 	void rayTrace();
 
 	void add(std::unique_ptr<SceneObject> object);
@@ -45,10 +44,10 @@ public:
 	void setCamera(const Camera& value) { camera = value; }
 	void setSize(int size);
 
-	bool isRayTraceDone() const
+	/*bool isRayTraceDone() const
 	{
 		return tasksDone == tasks.size();
-	}
+	}*/
 
 	const float* getPixels() const { return pixelData.get(); }
 
@@ -61,23 +60,23 @@ private:
 	std::vector<Light> lights{};
 	std::unique_ptr<float[]> pixelData{};
 	std::vector<Task> tasks{};
-	std::vector<std::thread> threads{};
+	//std::vector<std::thread> threads{};
 
 	Camera camera{};
 
 	vec4 ambientColour;
 	vec4 backgroundColour;
 
+	int size;
 	bool antiAliasing = false;
 	int maximumSteps = 5;
 
-	std::mutex mutex{};
+	/*std::mutex mutex{};
 	bool running = true;
 	bool workToDo = false;
 	std::condition_variable workConditionVariable{};
 	std::atomic_int taskPtr;
-	std::atomic_int tasksDone;
-	int size;
+	std::atomic_int tasksDone;*/
 
 	vec4 calculateShadows(const Ray& lightRay, SceneObject* selfObject, int step) const;
 	vec4 trace(const Ray& ray, SceneObject* selfObject, int step) const;
@@ -87,5 +86,5 @@ private:
 	void rayTraceNormal(const Task& task) const;
 	void rayTraceAA(const Task& task) const;
 
-	static void threadFunc(RayTracer* rayTracer);
+	//static void threadFunc(RayTracer* rayTracer);
 };

@@ -31,35 +31,36 @@ RayTracer::RayTracer()
 	size = DEFAULT_SIZE;
 	pixelData = std::unique_ptr<float[]>{ new float[size * size * 3] };
 
-	running = true;
+	/*running = true;
 	threads.resize(THREADS);
 	for (auto i = 0; i < THREADS; i++)
-		threads[i] = std::thread{ threadFunc, this };
+		threads[i] = std::thread{ threadFunc, this };*/
 }
 
 RayTracer::~RayTracer()
 {
-	running = false;
+	/*running = false;
 	for (auto i = 0; i < THREADS; i++)
 	{
 		threads[i].join();
-	}
+	}*/
 }
 
-void RayTracer::startRayTrace()
-{
-	createTasks();
+//void RayTracer::startRayTrace()
+//{
+//	createTasks();
+//
+//	taskPtr = 0;
+//	tasksDone = 0;
+//
+//	{
+//		std::lock_guard<std::mutex> lock(mutex);
+//		workToDo = true;
+//	}
+//
+//	workConditionVariable.notify_all();
+//}
 
-	taskPtr = 0;
-	tasksDone = 0;
-
-	{
-		std::lock_guard<std::mutex> lock(mutex);
-		workToDo = true;
-	}
-
-	workConditionVariable.notify_all();
-}
 void RayTracer::rayTrace()
 {
 	createTasks();
@@ -295,31 +296,31 @@ void RayTracer::rayTraceAA(const Task& task) const
 	}
 }
 
-void RayTracer::threadFunc(RayTracer* rayTracer)
-{
-	while (rayTracer->running)
-	{
-		{
-			std::unique_lock<std::mutex> lock(rayTracer->mutex);
-			rayTracer->workConditionVariable.wait(lock, [rayTracer] {return rayTracer->workToDo; });
-		}
-		
-		while (true)
-		{
-			auto nextTask = rayTracer->taskPtr++;
-			if (nextTask >= rayTracer->tasks.size())
-				break;
-
-			const auto& task = rayTracer->tasks[nextTask];
-
-			if (rayTracer->antiAliasing)
-				rayTracer->rayTraceAA(task);
-			else rayTracer->rayTraceNormal(task);
-
-			++rayTracer->tasksDone;
-		}
-	}
-}
+//void RayTracer::threadFunc(RayTracer* rayTracer)
+//{
+//	while (rayTracer->running)
+//	{
+//		{
+//			std::unique_lock<std::mutex> lock(rayTracer->mutex);
+//			rayTracer->workConditionVariable.wait(lock, [rayTracer] {return rayTracer->workToDo; });
+//		}
+//		
+//		while (true)
+//		{
+//			auto nextTask = rayTracer->taskPtr++;
+//			if (nextTask >= rayTracer->tasks.size())
+//				break;
+//
+//			const auto& task = rayTracer->tasks[nextTask];
+//
+//			if (rayTracer->antiAliasing)
+//				rayTracer->rayTraceAA(task);
+//			else rayTracer->rayTraceNormal(task);
+//
+//			++rayTracer->tasksDone;
+//		}
+//	}
+//}
 
 vec4 RayTracer::calculateShadows(const Ray& lightRay, SceneObject* selfObject, int step) const
 {

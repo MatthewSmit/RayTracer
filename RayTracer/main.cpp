@@ -1,6 +1,11 @@
 #include "RayTracer.h"
 
-#include <GL/freeglut.h>
+#include <SDL.h>
+
+#if defined(_WIN32)
+#include <Windows.h>
+#endif
+#include <GL/GL.h>
 
 #include <chrono>
 #include "JsonSceneLoader.h"
@@ -13,7 +18,7 @@ void renderString(float x, float y, const char* string)
 	glColor3f(0.5f, 1, 0.5f);
 	glRasterPos2f(x - 1, -(y - 1 + 0.05f));
 
-	glutBitmapString(GLUT_BITMAP_TIMES_ROMAN_24, reinterpret_cast<const unsigned char*>(string));
+	//glutBitmapString(GLUT_BITMAP_TIMES_ROMAN_24, reinterpret_cast<const unsigned char*>(string));
 }
 
 void display()
@@ -44,20 +49,17 @@ void display()
 
 	char buffer[1024];
 	snprintf(buffer, 1024, "Anti Aliasing (A): %s\nCurrent Size (-/+): %d",
-		rayTracer.getAntiAliasing() ? "true" : "false",
-		rayTracer.getSize());
+	         rayTracer.getAntiAliasing() ? "true" : "false",
+	         rayTracer.getSize());
 	renderString(0.0f, 0.0f, buffer);
-
-	glutPostRedisplay();
-	glutSwapBuffers();
 }
 
-void onKey(unsigned char key, int, int)
+void onKey(SDL_Keycode key)
 {
-	if (key == 'a' || key == 'A')
+	if (key == SDLK_a)
 		rayTracer.setAntiAliasing(!rayTracer.getAntiAliasing());
 
-	if (key == '-' || key == '_')
+	if (key == SDLK_MINUS || key == SDLK_KP_MINUS)
 	{
 		auto size = rayTracer.getSize();
 		size >>= 1;
@@ -66,7 +68,7 @@ void onKey(unsigned char key, int, int)
 		rayTracer.setSize(size);
 	}
 
-	if (key == '+' || key == '=')
+	if (key == SDLK_PLUS || key == SDLK_EQUALS || key == SDLK_KP_PLUS)
 	{
 		auto size = rayTracer.getSize();
 		size <<= 1;
@@ -88,17 +90,52 @@ void initialise()
 	loadSceneJson(&rayTracer, "scene-assignment.json");
 }
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
-	glutInit(&argc, argv);
-	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
-	glutInitWindowSize(1024, 1024);
-	glutCreateWindow("Raytracer");
+	if (SDL_Init(SDL_INIT_VIDEO) < 0)
+	{
+		printf("SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
+		exit(-1);
+	}
 
-	glutDisplayFunc(display);
-	glutKeyboardFunc(onKey);
+	auto window = SDL_CreateWindow("Raytracer", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1024, 1024, SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL);
+	if (window == nullptr)
+	{
+		printf("Window could not be created! SDL_Error: %s\n", SDL_GetError());
+		exit(-1);
+	}
+
+	auto glContext = SDL_GL_CreateContext(window);
+	if (glContext == nullptr)
+	{
+		printf("OpenGL context could not be created! SDL Error: %s\n", SDL_GetError());
+		exit(-2);
+	}
+
 	initialise();
 
-	glutMainLoop();
+	auto quit = false;
+	while (!quit)
+	{
+		SDL_Event event;
+		while (SDL_PollEvent(&event) != 0)
+		{
+			if (event.type == SDL_QUIT)
+			{
+				quit = true;
+			}
+			else if (event.type == SDL_KEYDOWN)
+			{
+				onKey(event.key.keysym.sym);
+			}
+		}
+
+		display();
+		SDL_GL_SwapWindow(window);
+	}
+
+	SDL_DestroyWindow(window);
+	SDL_Quit();
+
 	return 0;
 }
