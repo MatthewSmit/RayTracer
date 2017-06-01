@@ -128,14 +128,13 @@ void RayTracer::saveBmp(const char* fileName) const
 	{
 		for (auto y = 0; y < size; y++)
 		{
-			const auto bmpY = size - y - 1;
 			const auto r = static_cast<uint8_t>(pixelData[(x + y * size) * 3 + 0] * 255);
 			const auto g = static_cast<uint8_t>(pixelData[(x + y * size) * 3 + 1] * 255);
 			const auto b = static_cast<uint8_t>(pixelData[(x + y * size) * 3 + 2] * 255);
 
-			data[(x + bmpY * size) * 3 + 0] = r;
-			data[(x + bmpY * size) * 3 + 1] = g;
-			data[(x + bmpY * size) * 3 + 2] = b;
+			data[(x + y * size) * 3 + 0] = r;
+			data[(x + y * size) * 3 + 1] = g;
+			data[(x + y * size) * 3 + 2] = b;
 		}
 	}
 
