@@ -1,5 +1,7 @@
 #include "RayTracer.h"
 
+#include "mat4.h"
+
 #include "Image.h"
 #include "MathsHelper.h"
 #include "SceneObject.h"
@@ -158,6 +160,13 @@ void RayTracer::setAntiAliasing(bool value)
 	antiAliasing = value;
 }
 
+void RayTracer::setCamera(const Camera& value)
+{
+	camera = value;
+	auto cameraMatrix = lookAtLH(vec4{}, camera.direction, camera.up);
+	this->cameraMatrix = inverseTranspose(cameraMatrix);
+}
+
 void RayTracer::setSize(int size)
 {
 	// Wait for raytrace to be done
@@ -242,7 +251,8 @@ void RayTracer::rayTraceNormal(const Task& task) const
 		{
 			const auto xp = XMIN + (task.x + x) * cellX;
 
-			const auto direction = vec4{ xp + 0.5f * cellX, yp + 0.5f * cellY, -EDIST, 0 };	//direction of the primary ray
+			auto direction = vec4{ -(xp + 0.5f * cellX), yp + 0.5f * cellY, EDIST, 0 };	//direction of the primary ray
+			direction = cameraMatrix * direction;
 
 			const auto ray = Ray{ camera.position, normalise(direction) };
 			const auto colour = trace(ray, nullptr, maximumSteps); //Trace the primary ray and get the colour value

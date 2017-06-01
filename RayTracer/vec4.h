@@ -1,10 +1,11 @@
 #pragma once
+#include "AlignedObject.h"
+
 #include <immintrin.h>
 #include <xmmintrin.h>
 #include <algorithm>
+#include <cassert>
 #include <cmath>
-
-#include "AlignedObject.h"
 
 struct alignas(16) vec4 : AlignedObject
 {
@@ -45,6 +46,12 @@ struct alignas(16) vec4 : AlignedObject
 	operator __m128() const
 	{
 		return vector;
+	}
+
+	float operator[](int index) const
+	{
+		assert(index >= 0 && index < 4);
+		return (&x)[index];
 	}
 
 	union

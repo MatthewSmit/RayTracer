@@ -2,6 +2,7 @@
 #include "Camera.h"
 #include "Image.h"
 #include "Light.h"
+#include "mat4.h"
 #include "SceneObject.h"
 
 //#include <atomic>
@@ -41,7 +42,7 @@ public:
 	void setAmbientColour(const vec4& value) { ambientColour = value; }
 	void setAntiAliasing(bool value);
 	void setBackgroundColour(const vec4& value) { backgroundColour = value; }
-	void setCamera(const Camera& value) { camera = value; }
+	void setCamera(const Camera& value);
 	void setSize(int size);
 
 	/*bool isRayTraceDone() const
@@ -70,6 +71,8 @@ private:
 	int size;
 	bool antiAliasing = false;
 	int maximumSteps = 5;
+
+	mat4 cameraMatrix;
 
 	/*std::mutex mutex{};
 	bool running = true;
