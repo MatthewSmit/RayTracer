@@ -9,6 +9,7 @@
 #include "RayTracer.h"
 #include "SolidMaterial.h"
 #include "Sphere.h"
+#include "SinMaterial.h"
 #include "StripedMaterial.h"
 #include "TexturedMaterial.h"
 #include "Torus.h"
@@ -173,6 +174,23 @@ namespace
 		return std::make_unique<StripedMaterial>(horizontal, multiplier, colour1, colour2, reflectivity, refractivity, specularity);
 	}
 
+	std::unique_ptr<Material> parsePatternSin(RayTracer* rayTracer, const rapidjson::Value& material)
+	{
+		float reflectivity = 0;
+		if (material.HasMember("reflectivity"))
+			reflectivity = static_cast<float>(material["reflectivity"].GetDouble());
+
+		float refractivity = 0;
+		if (material.HasMember("refractivity"))
+			refractivity = static_cast<float>(material["refractivity"].GetDouble());
+
+		auto specularity = Material::DEFAULT_SPECULAR;
+		if (material.HasMember("specularity"))
+			specularity = static_cast<float>(material["specularity"].GetDouble());
+
+		return std::make_unique<SinMaterial>(reflectivity, refractivity, specularity);
+	}
+
 	std::unique_ptr<Material> parseMaterial(RayTracer* rayTracer, const rapidjson::Value& material)
 	{
 		auto type = material["type"].GetString();
@@ -183,6 +201,8 @@ namespace
 			return parseTexture(rayTracer, material);
 		if (strcmp(type, "pattern-stripe") == 0)
 			return parsePatternStripe(rayTracer, material);
+		if (strcmp(type, "pattern-sin") == 0)
+			return parsePatternSin(rayTracer, material);
 
 		throw std::exception();
 	}
@@ -277,6 +297,16 @@ namespace
 		rayTracer->add(std::make_unique<Torus>(position, majorRadius, minorRadius, move(material)));
 	}
 
+	void parseCube(RayTracer* rayTracer, const rapidjson::Value& object)
+	{
+		auto position = parseVector(object["position"]);
+		auto material = parseMaterial(rayTracer, object["material"]);
+
+		throw std::exception();
+
+		//rayTracer->add(std::make_unique<Torus>(position, majorRadius, minorRadius, move(material)));
+	}
+
 	void parseObject(RayTracer* rayTracer, const rapidjson::Value& object)
 	{
 		auto type = object["type"].GetString();
@@ -293,6 +323,8 @@ namespace
 			parseCone(rayTracer, object);
 		else if (strcmp(type, "torus") == 0)
 			parseTorus(rayTracer, object);
+		else if (strcmp(type, "cube") == 0)
+			parseCube(rayTracer, object);
 		else
 			throw std::exception();
 	}

@@ -6,17 +6,16 @@
 #include "MathsHelper.h"
 #include "SceneObject.h"
 
+#include <cassert>
+#include <memory>
+#include <future>
+
 #if defined(_MSC_VER)
 #include <SOIL.h>
 #else
 #include <SOIL/SOIL.h>
 #endif
 
-#include <cassert>
-#include <memory>
-#include <future>
-
-static constexpr int WORK_SIZE = 16;
 static constexpr int DEFAULT_SIZE = 512;
 
 static constexpr float WIDTH = 20.0f;
@@ -30,8 +29,12 @@ static constexpr int THREADS = 4;
 
 RayTracer::RayTracer()
 {
-	size = DEFAULT_SIZE;
-	pixelData = std::unique_ptr<float[]>{ new float[size * size * 3] };
+	setSize(DEFAULT_SIZE);
+	antiAliasing =
+	{
+		AntiAliasingMode::None,
+		2
+	};
 
 	/*running = true;
 	threads.resize(THREADS);
@@ -67,14 +70,20 @@ void RayTracer::rayTrace()
 {
 	createTasks();
 
-	for (const auto& task : tasks)
+	switch (antiAliasing.mode)
 	{
-		if (antiAliasing)
-			rayTraceAA(task);
-		else rayTraceNormal(task);
+	case AntiAliasingMode::None:
+		for (const auto& task : tasks)
+			rayTrace(task);
+		break;
+	case AntiAliasingMode::Regular:
+		for (const auto& task : tasks)
+			rayTraceRegularAA(task);
+		break;
+	default:
+		assert(0);
+		break;
 	}
-
-	//saveBmp("dmp.bmp");
 }
 
 void RayTracer::add(std::unique_ptr<SceneObject> object)
@@ -99,26 +108,7 @@ void RayTracer::clear()
 
 Image* RayTracer::loadTexture(const char* path)
 {
-	int width;
-	int height;
-	int channels;
-	auto pixels = SOIL_load_image(path, &width, &height, &channels, SOIL_LOAD_RGBA);
-	if (pixels == nullptr)
-	{
-		printf("%s\n", SOIL_last_result());
-		throw std::exception();
-	}
-
-	auto realPixels = std::unique_ptr<uint8_t[]>{ new uint8_t[width * height * 4] };
-	const auto scanLine = width * 4;
-	for (auto i = 0; i < height; i++)
-	{
-		auto src = pixels + (height - 1 - i) * scanLine;
-		auto dst = realPixels.get() + i * scanLine;
-		memcpy(dst, src, scanLine);
-	}
-
-	auto image = new Image(width, height, move(realPixels));
+	auto image = Image::loadTexture(path);
 	images.push_back(std::unique_ptr<Image>{image});
 	return image;
 }
@@ -150,7 +140,7 @@ void RayTracer::saveBmp(const char* fileName) const
 	assert(saveResult == 1);
 }
 
-void RayTracer::setAntiAliasing(bool value)
+void RayTracer::setAntiAliasing(const AntiAliasingController& value)
 {
 	// Wait for raytrace to be done
 	//while (!isRayTraceDone())
@@ -175,12 +165,9 @@ void RayTracer::setSize(int size)
 	//}
 
 	this->size = size;
+	cellWidth = (XMAX - XMIN) / size;
+	cellHeight = (YMAX - YMIN) / size;
 	pixelData = std::unique_ptr<float[]>{ new float[size * size * 3] };
-}
-
-int RayTracer::getSize() const
-{
-	return size;
 }
 
 //Finds the closest point of intersection of the current ray with scene objects
@@ -214,95 +201,75 @@ bool RayTracer::closestPoint(const Ray& ray, IntersectionResult& result, SceneOb
 
 void RayTracer::createTasks()
 {
-	assert((size % WORK_SIZE) == 0);
+	tasks.resize(size);
 
-	auto workElements = size / WORK_SIZE;
-	workElements *= workElements;
-
-	tasks.resize(workElements);
-
-	for (auto x = 0, i = 0; x < size; x += WORK_SIZE)
+	for (auto y = 0; y < size; y++)
 	{
-		for (auto y = 0; y < size; y += WORK_SIZE)
-		{
-			tasks[i].x = x;
-			tasks[i].y = y;
-			tasks[i].stride = size * 3;
-			tasks[i].pixels = pixelData.get() + (x + y * size) * 3;
-			i++;
-		}
+		tasks[y].y = y;
+		tasks[y].pixels = pixelData.get() + y * size * 3;
 	}
 
-	for (auto i = 0; i < size * size* 3; i++)
+	for (auto i = 0; i < size * size * 3; i++)
 		pixelData[i] = 0;
 }
 
-void RayTracer::rayTraceNormal(const Task& task) const
+void RayTracer::rayTrace(const Task& task) const
 {
-	const auto cellX = (XMAX - XMIN) / size;  //cell width
-	const auto cellY = (YMAX - YMIN) / size;  //cell height
+	const auto yp = YMAX - task.y * cellHeight;
 
-	for (auto y = 0; y < WORK_SIZE; y++)
+	for (auto x = 0; x < size; x++)
 	{
-		auto pixelPtr = task.pixels + y * task.stride;
-		const auto yp = YMAX - (task.y + y) * cellY;
+		const auto xp = XMIN + x * cellWidth;
 
-		for (auto x = 0; x < WORK_SIZE; x++)
-		{
-			const auto xp = XMIN + (task.x + x) * cellX;
+		auto direction = vec4{ -(xp + 0.5f * cellWidth), yp + 0.5f * cellHeight, EDIST, 0 };	//direction of the primary ray
+		direction = cameraMatrix * direction;
 
-			auto direction = vec4{ -(xp + 0.5f * cellX), yp + 0.5f * cellY, EDIST, 0 };	//direction of the primary ray
-			direction = cameraMatrix * direction;
+		const auto ray = Ray{ camera.position, normalise(direction) };
+		const auto colour = trace(ray, nullptr, maximumSteps); //Trace the primary ray and get the colour value
 
-			const auto ray = Ray{ camera.position, normalise(direction) };
-			const auto colour = trace(ray, nullptr, maximumSteps); //Trace the primary ray and get the colour value
-
-			pixelPtr[x * 3 + 0] = colour.x;
-			pixelPtr[x * 3 + 1] = colour.y;
-			pixelPtr[x * 3 + 2] = colour.z;
-		}
+		task.pixels[x * 3 + 0] = colour.x;
+		task.pixels[x * 3 + 1] = colour.y;
+		task.pixels[x * 3 + 2] = colour.z;
 	}
 }
 
-void RayTracer::rayTraceAA(const Task& task) const
+void RayTracer::rayTraceRegularAA(const Task& task) const
 {
-	const auto cellX = (XMAX - XMIN) / size;  //cell width
-	const auto cellY = (YMAX - YMIN) / size;  //cell height
-	const auto cellX4 = cellX / 4;
-	const auto cellY4 = cellY / 4;
+	auto divisions = antiAliasing.sampleDivision;
+	auto divisions2 = divisions * divisions;
 
-	for (auto y = 0; y < WORK_SIZE; y++)
+	auto halfWidth = cellWidth * 0.5f;
+	auto halfHeight = cellHeight * 0.5f;
+	auto segments = divisions * 2 + 1;
+	auto widthAdvance = cellWidth / segments;
+	auto heightAdvance = cellHeight / segments;
+
+	const auto yp = YMAX - task.y * cellHeight;
+
+	auto ray = Ray{ camera.position, vec4{} };
+
+	for (auto x = 0; x < size; x++)
 	{
-		auto pixelPtr = task.pixels + y * task.stride;
-		const auto yp = YMAX - (task.y + y) * cellY;
+		const auto xp = XMIN + x * cellWidth;
 
-		for (auto x = 0; x < WORK_SIZE; x++)
+		auto colour = vec4{};
+		for (auto ay = 0; ay < divisions; ay++)
 		{
-			const auto xp = XMIN + (task.x + x) * cellX;
-
-			//direction of the primary ray
-			const auto direction1 = vec4{ xp + 0.5f * cellX - cellX4, yp + 0.5f * cellY + cellY4, -EDIST, 0 };
-			const auto direction2 = vec4{ xp + 0.5f * cellX - cellX4, yp + 0.5f * cellY - cellY4, -EDIST, 0 };
-			const auto direction3 = vec4{ xp + 0.5f * cellX + cellX4, yp + 0.5f * cellY + cellY4, -EDIST, 0 };
-			const auto direction4 = vec4{ xp + 0.5f * cellX + cellX4, yp + 0.5f * cellY - cellY4, -EDIST, 0 };
-
-			const auto ray1 = Ray{ camera.position, normalise(direction1) };
-			const auto ray2 = Ray{ camera.position, normalise(direction2) };
-			const auto ray3 = Ray{ camera.position, normalise(direction3) };
-			const auto ray4 = Ray{ camera.position, normalise(direction4) };
-
-			//Trace the primary ray and get the colour value
-			const auto colour1 = trace(ray1, nullptr, maximumSteps);
-			const auto colour2 = trace(ray2, nullptr, maximumSteps);
-			const auto colour3 = trace(ray3, nullptr, maximumSteps);
-			const auto colour4 = trace(ray4, nullptr, maximumSteps);
-
-			const auto colour = (colour1 + colour2 + colour3 + colour4) * 0.25f;
-
-			pixelPtr[x * 3 + 0] = colour.x;
-			pixelPtr[x * 3 + 1] = colour.y;
-			pixelPtr[x * 3 + 2] = colour.z;
+			auto heightAddition = -halfHeight + heightAdvance * (ay * 2 + 1);
+			for (auto ax = 0; ax < divisions; ax++)
+			{
+				auto widthAddition = -halfWidth + widthAdvance * (ax * 2 + 1);
+				const auto direction = vec4{ -(xp + 0.5f * cellWidth + widthAddition), yp + 0.5f * cellHeight + heightAddition, EDIST, 0 };
+				ray.direction = normalise(cameraMatrix * direction);
+				colour += trace(ray, nullptr, maximumSteps); //Trace the primary ray and get the colour value
+			}
 		}
+
+		colour /= divisions2;
+
+		task.pixels[x * 3 + 0] = colour.x;
+		task.pixels[x * 3 + 1] = colour.y;
+		task.pixels[x * 3 + 2] = colour.z;
 	}
 }
 

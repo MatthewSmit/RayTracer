@@ -10,15 +10,13 @@ bool Sphere::intersect(const Ray& ray, IntersectionResult& result) const
 	const auto b = dot(ray.direction, difference);
 	const auto len = length(difference);
 	const auto c = len * len - radius * radius;
-	const auto delta = b * b - c;
+	const auto discriminant = b * b - c;
 
-	if (fabs(delta) < std::numeric_limits<float>::epsilon())
-		return false;
-	if (delta < 0)
+	if (discriminant <= 0)
 		return false;
 
-	auto t1 = -b - sqrtf(delta);
-	auto t2 = -b + sqrtf(delta);
+	auto t1 = -b - sqrtf(discriminant);
+	auto t2 = -b + sqrtf(discriminant);
 	if (fabs(t1) < std::numeric_limits<float>::epsilon())
 		t1 = -1;
 	if (fabs(t2) < std::numeric_limits<float>::epsilon())

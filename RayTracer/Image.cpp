@@ -1,5 +1,11 @@
 #include "Image.h"
 
+#if defined(_MSC_VER)
+#include <SOIL.h>
+#else
+#include <SOIL/SOIL.h>
+#endif
+
 Image::Image(int width, int height, std::unique_ptr<uint8_t[]>&& pixels) :
 	width{ width },
 	height{ height },
@@ -47,4 +53,28 @@ vec4 Image::sample(int x, int y) const
 		static_cast<float>(pixel[3])
 	};
 	return colour / 255;
+}
+
+Image* Image::loadTexture(const char* path)
+{
+	int width;
+	int height;
+	int channels;
+	auto pixels = SOIL_load_image(path, &width, &height, &channels, SOIL_LOAD_RGBA);
+	if (pixels == nullptr)
+	{
+		printf("%s\n", SOIL_last_result());
+		throw std::exception();
+	}
+
+	auto realPixels = std::unique_ptr<uint8_t[]>{ new uint8_t[width * height * 4] };
+	const auto scanLine = width * 4;
+	for (auto i = 0; i < height; i++)
+	{
+		auto src = pixels + (height - 1 - i) * scanLine;
+		auto dst = realPixels.get() + i * scanLine;
+		memcpy(dst, src, scanLine);
+	}
+
+	return new Image(width, height, move(realPixels));
 }

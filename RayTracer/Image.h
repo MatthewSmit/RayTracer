@@ -12,6 +12,8 @@ public:
 	vec4 sample(const vec4& textureCoordinate) const;
 	vec4 sample(int x, int y) const;
 
+	static Image* loadTexture(const char* path);
+
 private:
 	int width;
 	int height;

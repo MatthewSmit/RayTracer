@@ -22,6 +22,8 @@
     <ClInclude Include="SolidMaterial.h" />
     <ClInclude Include="TexturedMaterial.h" />
     <ClInclude Include="StripedMaterial.h" />
+    <ClInclude Include="AntiAliasingController.h" />
+    <ClInclude Include="SinMaterial.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="RayTracer.cpp" />
@@ -37,6 +39,8 @@
     <ClCompile Include="AlignedObject.cpp" />
     <ClCompile Include="TexturedMaterial.cpp" />
     <ClCompile Include="StripedMaterial.cpp" />
+    <ClCompile Include="AntiAliasingController.cpp" />
+    <ClCompile Include="SinMaterial.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="scene3.json" />
@@ -49,5 +53,9 @@
     <None Include="scene6.json" />
     <None Include="scene7.json" />
     <None Include="scene-assignment.json" />
+    <None Include="scene8.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Todo.txt" />
   </ItemGroup>
 </Project>

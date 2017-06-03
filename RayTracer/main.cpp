@@ -49,7 +49,7 @@ void display()
 
 	char buffer[1024];
 	snprintf(buffer, 1024, "Anti Aliasing (A): %s\nCurrent Size (-/+): %d",
-	         rayTracer.getAntiAliasing() ? "true" : "false",
+			antiAliasingModeToString(rayTracer.getAntiAliasing().mode),
 	         rayTracer.getSize());
 	renderString(0.0f, 0.0f, buffer);
 }
@@ -57,7 +57,20 @@ void display()
 void onKey(SDL_Keycode key)
 {
 	if (key == SDLK_a)
-		rayTracer.setAntiAliasing(!rayTracer.getAntiAliasing());
+	{
+		auto antiAliasing = rayTracer.getAntiAliasing();
+		antiAliasing.mode = static_cast<AntiAliasingMode>((static_cast<int>(antiAliasing.mode) + 1) % static_cast<int>(AntiAliasingMode::Last));
+		rayTracer.setAntiAliasing(antiAliasing);
+	}
+
+	if (key == SDLK_s)
+	{
+		auto antiAliasing = rayTracer.getAntiAliasing();
+		antiAliasing.sampleDivision = (antiAliasing.sampleDivision + 1) % 11;
+		if (antiAliasing.sampleDivision < 2)
+			antiAliasing.sampleDivision = 2;
+		rayTracer.setAntiAliasing(antiAliasing);
+	}
 
 	if (key == SDLK_MINUS || key == SDLK_KP_MINUS)
 	{
@@ -76,6 +89,11 @@ void onKey(SDL_Keycode key)
 			size = 2048;
 		rayTracer.setSize(size);
 	}
+
+	if (key == SDLK_PRINTSCREEN)
+	{
+		rayTracer.saveBmp("dmp.bmp");
+	}
 }
 
 void initialise()
@@ -87,10 +105,10 @@ void initialise()
 	glEnable(GL_TEXTURE_2D);
 	glClearColor(0, 0, 0, 1);
 
-	loadSceneJson(&rayTracer, "scene-assignment.json");
+	loadSceneJson(&rayTracer, "scene8.json");
 }
 
-int main(int argc, char* argv[])
+int main(int, char*[])
 {
 	if (SDL_Init(SDL_INIT_VIDEO) < 0)
 	{

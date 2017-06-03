@@ -1,4 +1,5 @@
 #pragma once
+#include "AntiAliasingController.h"
 #include "Camera.h"
 #include "Image.h"
 #include "Light.h"
@@ -16,9 +17,7 @@ struct Ray;
 
 struct Task
 {
-	int x;
 	int y;
-	int stride;
 	float* pixels;
 };
 
@@ -40,7 +39,7 @@ public:
 	void saveBmp(const char* fileName) const;
 
 	void setAmbientColour(const vec4& value) { ambientColour = value; }
-	void setAntiAliasing(bool value);
+	void setAntiAliasing(const AntiAliasingController& value);
 	void setBackgroundColour(const vec4& value) { backgroundColour = value; }
 	void setCamera(const Camera& value);
 	void setSize(int size);
@@ -52,8 +51,8 @@ public:
 
 	const float* getPixels() const { return pixelData.get(); }
 
-	int getSize() const;
-	bool getAntiAliasing() const { return antiAliasing; }
+	const AntiAliasingController& getAntiAliasing() const { return antiAliasing; }
+	int getSize() const { return size; }
 
 private:
 	std::vector<std::unique_ptr<SceneObject>> sceneObjects{};
@@ -68,9 +67,12 @@ private:
 	vec4 ambientColour;
 	vec4 backgroundColour;
 
-	int size;
-	bool antiAliasing = false;
+	AntiAliasingController antiAliasing{};
 	int maximumSteps = 5;
+
+	int size;
+	float cellWidth;
+	float cellHeight;
 
 	mat4 cameraMatrix;
 
@@ -86,8 +88,8 @@ private:
 	bool closestPoint(const Ray& ray, IntersectionResult& result, SceneObject*& hitObject, SceneObject* selfObject = nullptr) const;
 
 	void createTasks();
-	void rayTraceNormal(const Task& task) const;
-	void rayTraceAA(const Task& task) const;
+	void rayTrace(const Task& task) const;
+	void rayTraceRegularAA(const Task& task) const;
 
 	//static void threadFunc(RayTracer* rayTracer);
 };

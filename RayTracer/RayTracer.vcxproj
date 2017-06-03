@@ -333,6 +333,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="AlignedObject.h" />
+    <ClInclude Include="AntiAliasingController.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Cone.h" />
     <ClInclude Include="Cylinder.h" />
@@ -347,6 +348,7 @@
     <ClInclude Include="Ray.h" />
     <ClInclude Include="RayTracer.h" />
     <ClInclude Include="SceneObject.h" />
+    <ClInclude Include="SinMaterial.h" />
     <ClInclude Include="SolidMaterial.h" />
     <ClInclude Include="Sphere.h" />
     <ClInclude Include="StripedMaterial.h" />
@@ -356,6 +358,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AlignedObject.cpp" />
+    <ClCompile Include="AntiAliasingController.cpp" />
     <ClCompile Include="Cone.cpp" />
     <ClCompile Include="Cylinder.cpp" />
     <ClCompile Include="Image.cpp" />
@@ -364,6 +367,7 @@
     <ClCompile Include="InfinitePlane.cpp" />
     <ClCompile Include="Polygon.cpp" />
     <ClCompile Include="RayTracer.cpp" />
+    <ClCompile Include="SinMaterial.cpp" />
     <ClCompile Include="Sphere.cpp" />
     <ClCompile Include="StripedMaterial.cpp" />
     <ClCompile Include="TexturedMaterial.cpp" />
@@ -379,7 +383,11 @@
     <None Include="scene5.json" />
     <None Include="scene6.json" />
     <None Include="scene7.json" />
+    <None Include="scene8.json" />
     <None Include="sceneSchema.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Todo.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
@@ -416,7 +424,7 @@
   </Target>
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties scene2_1json__JSONSchema="sceneSchema.json" scene1_1json__JSONSchema="sceneSchema.json" scene6_1json__JSONSchema="sceneSchema.json" scene5_1json__JSONSchema="sceneSchema.json" scene-assignment_1json__JSONSchema="sceneSchema.json" sceneSchema_1json__JSONSchema="http://json-schema.org/draft-04/schema" scene3_1json__JSONSchema="sceneSchema.json" scene4_1json__JSONSchema="sceneSchema.json" />
+      <UserProperties scene2_1json__JSONSchema="sceneSchema.json" scene1_1json__JSONSchema="sceneSchema.json" scene6_1json__JSONSchema="sceneSchema.json" scene5_1json__JSONSchema="sceneSchema.json" scene-assignment_1json__JSONSchema="sceneSchema.json" sceneSchema_1json__JSONSchema="http://json-schema.org/draft-04/schema" scene3_1json__JSONSchema="sceneSchema.json" scene4_1json__JSONSchema="sceneSchema.json" scene8_1json__JSONSchema="sceneSchema.json" />
     </VisualStudio>
   </ProjectExtensions>
 </Project>
